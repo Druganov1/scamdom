@@ -4,6 +4,15 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Events\testEvent;
+
+Route::get('/test-broadcast', function () {
+    testEvent::dispatch();
+
+
+    return 'Event dispatched!';
+});
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [

@@ -4,6 +4,9 @@ import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link } from '@inertiajs/react';
+import WalletBalance from '@/Components/WalletBalance';
+import { useEffect } from 'react';
+
 
 export default function Authenticated({ user, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
@@ -18,6 +21,9 @@ export default function Authenticated({ user, header, children }) {
         { name: 'Support', routeName: 'support.index' },
         { name: 'Rewards', routeName: 'rewards.index' },
     ];
+
+
+
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -74,15 +80,7 @@ export default function Authenticated({ user, header, children }) {
 
                 <div className="flex items-center space-x-4">
                     {/* Wallet Section */}
-                    <div className="flex items-center space-x-2 bg-gray-800 rounded-lg px-4 py-2">
-                        <div className="flex items-center space-x-1 text-white">
-                            <span className="text-green-400 text-lg">$</span>
-                            <span className="text-lg font-semibold">0.00</span>
-                        </div>
-                        <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold">
-                            Wallet
-                        </button>
-                    </div>
+                    <WalletBalance />
 
                     {/* Profile Dropdown */}
                     <Dropdown>
