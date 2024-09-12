@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-
+use App\Models\User;
 
 class WalletBalanceUpdated implements ShouldBroadcastNow
 {
@@ -21,9 +21,11 @@ class WalletBalanceUpdated implements ShouldBroadcastNow
      */
 
     public $balance;
-    public function __construct($balance)
+    public  User $user;
+    public function __construct($balance, $user)
     {
         $this->balance = $balance;
+        $this->user = $user;
     }
 
     /**
@@ -34,8 +36,8 @@ class WalletBalanceUpdated implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
 
-        return[
-            new Channel('wallet-balance'),
+        return [
+            new PrivateChannel('wallet-balance.' . $this->user->id),
         ];
 
     }
@@ -44,6 +46,7 @@ class WalletBalanceUpdated implements ShouldBroadcastNow
     {
         return [
             'balance' => $this->balance,
+            'user' => $this->user->only(['id', 'name']),  // Optionally include more user data
         ];
     }
 

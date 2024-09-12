@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Events\WalletBalanceUpdated;
+use App\Events\testEvent;
+use App\Models\User;
 
 class TriggerWalletBalanceUpdate extends Command
 {
@@ -12,7 +14,7 @@ class TriggerWalletBalanceUpdate extends Command
      *
      * @var string
      */
-    protected $signature = 'trigger:wallet-balance {balance}';
+    protected $signature = 'trigger:wallet-balance {balance} {id}';
     protected $description = 'Trigger a wallet balance update event';
 
     /**
@@ -26,13 +28,14 @@ class TriggerWalletBalanceUpdate extends Command
      */
     public function handle()
     {
+        $user = User::find( $this->argument('id'));
+
         $balance = $this->argument('balance');
 
         // Trigger the event
 
-        // WalletBalanceUpdated::dispatch($balance);
+        WalletBalanceUpdated::dispatch($balance, $user);
 
-        broadcast(new WalletBalanceUpdated($balance));
         $this->info("Wallet balance update triggered: $balance");
     }
 }

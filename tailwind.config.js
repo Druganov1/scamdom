@@ -15,6 +15,23 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                scamdom:{
+                    30: '#181f26',
+                    40: '#131a22',
+                    50: '#0b131b',
+
+                    90: '#0a1119',
+                    slot: 'linear-gradient(219deg, rgb(7, 109, 203) 0%, rgb(65, 148, 226) 100%)',
+                    crash: 'linear-gradient(219deg, rgb(10, 131, 79) 0%, rgb(1, 194, 96) 100%)',
+                    roulette: 'linear-gradient(227deg, rgb(142, 12, 37) 0%, rgb(204, 20, 53) 100%)',
+                    dice: 'linear-gradient(227deg, rgb(14, 38, 123) 0%, rgb(43, 68, 157) 100%)',
+                    hilo: 'linear-gradient(227deg, rgb(133, 60, 48) 0%, rgb(133, 95, 35) 100%)',
+                },
+
+
+
+            }
         },
     },
 
