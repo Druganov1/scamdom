@@ -1,5 +1,5 @@
 import Dropdown from '@/Components/Dropdown';
-import WalletBalance from '@/Components/WalletBalance';
+import WalletComp from '@/Components/WalletComp';
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -77,7 +77,7 @@ export default function Header({user}) {
 
             <div className="flex items-center space-x-4">
                 {/* Wallet Section */}
-                <WalletBalance user={user} />
+                <WalletComp user={user} />
 
                 {/* Profile Dropdown */}
                 <Dropdown>
