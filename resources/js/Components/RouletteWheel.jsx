@@ -8,6 +8,7 @@ const RouletteWheel = () => {
     const [spinningNow, setSpinning] = useState(false);
     const [landed, setLanded] = useState(false);
     const [slot, setSlot] = useState(0);
+    const [countdown, setCountdown] = useState(0);
 
     const wheelRef = useRef(null);
 
@@ -15,10 +16,65 @@ const RouletteWheel = () => {
     useEffect(() => {
         initWheel();
 
+
+
+        axios.post(route('api.roulette-init'))
+            .then(response => {
+            const data = response.data;
+            console.log('Initial data:', data);
+
+            if (data.currentStage === 'countdown') {
+                setCountdown(data.remainingTime);
+                console.log('countdown:', data.remainingTime);
+                setShowStopwatch(true);
+            } else if (data.currentStage === 'spin') {
+                let now = Date.now();
+                let time = now - (data.timeAtSpin*1000);
+                let spintime = 6000 - time
+
+
+                spinWheel(data.gameResult, spintime);
+                setSpinning(true);
+                setSlot(data.gameResult);
+            } else if (data.currentStage === 'result') {
+                setSlot(data.gameResult);
+                spinWheel(data.gameResult, 0);
+
+                setLanded(true);
+            }
+
+            // this is for people who just joined and the game is going, so they can see the current state
+
+            // availible parameters: currentStage, countDown_msec, gameResult
+            })
+            .catch(error => console.error('Error fetching init data:', error));
+
         window.Echo.channel('roulette').listen('RouletteService', (e) => {
-            console.log(`result from echo ${e.num}`);
-            spinWheel(e.num);
-            setSlot(e.num);
+            let data = e.data;
+            switch (data.currentStage) {
+                case 'countdown':
+                    setCountdown(data.countDown_msec);
+                    setShowStopwatch(true);
+                    setLanded(false);
+
+
+                    break;
+                case 'spin':
+
+                    setShowStopwatch(false);
+                    spinWheel(data.number, 6000);
+                    setSpinning(true);
+                    setSlot(data.number);
+                    break;
+                case 'result':
+                    setLanded(true);
+                    setSpinning(false);
+
+
+
+                default:
+                    break;
+            }
         });
 
     }, []);
@@ -58,14 +114,14 @@ const RouletteWheel = () => {
         ];
 
         return cells.map(({ color, number }) => `
-            <div class="h-[75px] w-[75px] m-[3px] rounded-lg bg-scamdom-roulette-${color} flex items-center justify-center text-white text-2xl">
+            <div class="h-[75px] w-[75px] m-[3px] rounded-lg roulette-${color} flex items-center justify-center text-white text-2xl">
                 ${number}
             </div>
         `).join('');
     };
 
     // Function to spin the wheel
-    const spinWheel = (roll) => {
+    const spinWheel = (roll, spintime) => {
         setShowStopwatch(false);
         setSpinning(true);
 
@@ -99,24 +155,18 @@ const RouletteWheel = () => {
             const resetTo = -(position * cardSize + randomize);
             wheel.style.transform = `translate3d(${resetTo}px, 0px, 0px)`;
 
-            setShowStopwatch(false);
-            setLanded(true);
-            setSpinning(false);
-            setTimeout(() => {
-                setLanded(false);
-                setShowStopwatch(true);
-            }, 4000);
 
-        }, 6000);
+        }, spintime);
     };
 
     return (
         <div className="flex flex-col items-center">
             <div className="mb-10 text-white">
-                {showStopwatch && <RouletteStopwatch />}
+                {showStopwatch && <RouletteStopwatch  initialTimeInMilliseconds={countdown} />}
                 {spinningNow && <SpinningNow />}
                 {landed && <RouletteResult result={slot} />}
             </div>
+
 
             <div className="roulette-wrapper relative flex justify-center w-full mx-auto overflow-hidden">
                 <div className="w-[3px] bg-gray-500 h-full absolute left-1/2 z-10 -translate-x-1/2"></div>

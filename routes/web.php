@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Events\testEvent;
 use App\Http\Controllers\BalanceController;
+use App\Console\Commands\RouletteTimer;
 
 Route::get('/test-broadcast', function () {
     testEvent::dispatch();
@@ -53,6 +54,8 @@ Route::prefix('api') // Prefix for all routes
     ->middleware('auth') // Middleware to apply
     ->group(function () {
         Route::post('/add-funds', [BalanceController::class, 'addFunds'])->name('api.addfunds');
+        Route::post('/roulette/init', [RouletteTimer::class, 'init'])->name('api.roulette-init');
+
     });
 
 //API ROUTES

@@ -18,11 +18,11 @@ class RouletteService implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      */
-    public $num;
-    public function __construct($num)
+    public $data;
+    public function __construct($data)
     {
         //
-        $this->num = $num;
+        $this->data = $data;
     }
 
     /**

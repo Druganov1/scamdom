@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const RouletteStopwatch = ({ initialTimeInSeconds = 20 }) => { // Set default countdown time (e.g., 60 seconds)
-  const [seconds, setSeconds] = useState(initialTimeInSeconds);
-  const [microseconds, setMicroseconds] = useState(0);
+export default function RouletteStopwatch({ initialTimeInMilliseconds }) {
+  const [seconds, setSeconds] = useState(initialTimeInMilliseconds / 1000);
   const startTimeRef = useRef(null);
 
   useEffect(() => {
@@ -13,12 +12,9 @@ const RouletteStopwatch = ({ initialTimeInSeconds = 20 }) => { // Set default co
       const totalElapsedTimeInSeconds = elapsedTime / 1000;
 
       // Calculate remaining time
-      const remainingTimeInSeconds = Math.max(0, initialTimeInSeconds - totalElapsedTimeInSeconds);
-      const remainingSeconds = Math.floor(remainingTimeInSeconds);
-      const remainingMicroseconds = Math.floor((remainingTimeInSeconds % 1) * 100);
+      const remainingTimeInSeconds = Math.max(0, (initialTimeInMilliseconds / 1000) - totalElapsedTimeInSeconds);
 
-      setSeconds(remainingSeconds);
-      setMicroseconds(remainingMicroseconds);
+      setSeconds(remainingTimeInSeconds);
 
       if (remainingTimeInSeconds <= 0) {
         clearInterval(intervalId);
@@ -27,18 +23,14 @@ const RouletteStopwatch = ({ initialTimeInSeconds = 20 }) => { // Set default co
 
     // Cleanup on component unmount
     return () => clearInterval(intervalId);
-  }, [initialTimeInSeconds]);
+  }, [initialTimeInMilliseconds]);
 
   return (
-<div className='flex flex-col items-center justify-center'>
-  <p className='text-xs mb-1'>Spinning in</p>
-  <h5 className='text-2xl font-mono'>
-    {String(seconds).padStart(2, '0')}.{String(microseconds).padStart(2, '0')} s
-  </h5>
-</div>
-
+    <div className='flex flex-col items-center justify-center'>
+      <p className='text-xs mb-1'>Spinning in</p>
+      <h5 className='text-2xl font-mono'>
+        {String(Math.floor(seconds)).padStart(2, '0')}.{String(Math.floor((seconds % 1) * 100)).padStart(2, '0')} s
+      </h5>
+    </div>
   );
-};
-
-export default RouletteStopwatch;
-
+}

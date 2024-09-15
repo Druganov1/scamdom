@@ -24,12 +24,11 @@ export default {
                     40: '#131a22',
                     50: '#0b131b',
                     90: '#0a1119',
-
-                    roulette:{
-                        red: 'rgb(236, 75, 63)',
-                        green: 'rgb(48, 193, 73)',
-                        black: 'rgb(53, 57, 66)',
-                    },
+                },
+                roulette:{
+                    red: 'rgb(236, 75, 63)',
+                    green: 'rgb(48, 193, 73)',
+                    black: 'rgb(53, 57, 66)',
                 },
 
 

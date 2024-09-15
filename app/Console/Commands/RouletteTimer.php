@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 
 use App\Events\RouletteService;
+use Illuminate\Support\Facades\Cache;
 
 class RouletteTimer extends Command
 {
@@ -27,6 +28,70 @@ class RouletteTimer extends Command
     }
 
 
+    public $startTime;
+    public $gameResult;
+    public $currentStage;
+    public $timeAtSpin;
+
+    public function init()
+    {
+
+        $cachedStartTime = Cache::get('roulette_start_time');
+        $cachedGameResult = Cache::get('roulette_game_result');
+        $currentStage = Cache::get('current_game_stage');
+
+        \Log::info($currentStage); // als deze hier niet is dan werkt het helemaal niet bruh
+
+
+        if (!$cachedStartTime || !$cachedGameResult || !$currentStage) {
+            return [
+                'gameResult' => null,
+                'remainingTime' => null,
+                'currentStage' => $currentStage
+            ];
+        }
+
+        $currentTime = time();
+        $elapsedTime = $currentTime - $cachedStartTime;
+
+
+        $stageDurations = [
+            'countdown' => 15,
+            'spin' => 6,
+            'result' => 6
+        ];
+
+        // Determine the current stage and calculate remaining time
+        $remainingTime = null;
+        $stageStartTime = $elapsedTime;
+
+        if ($currentStage === 'countdown') {
+            $remainingTime = max(0, ($stageDurations['countdown'] - $elapsedTime) * 1000); // Convert to milliseconds
+            $timeAtSpin= null;
+
+        } elseif ($currentStage === 'spin') {
+            $stageStartTime -= $stageDurations['countdown'];
+            $remainingTime = max(0, ($stageDurations['spin'] - ($elapsedTime - $stageStartTime)) * 1000); // Convert to milliseconds
+            $timeAtSpin= Cache::get('time_at_spin');
+
+        } elseif ($currentStage === 'result') {
+            $stageStartTime -= ($stageDurations['countdown'] + $stageDurations['spin']);
+            $remainingTime = max(0, ($stageDurations['result'] - ($elapsedTime - $stageStartTime)) * 1000); // Convert to milliseconds
+            $timeAtSpin= null;
+
+        }
+
+        return [
+            'timeAtSpin' => $timeAtSpin,
+            'gameResult' => $cachedGameResult,
+            'remainingTime' => $remainingTime,
+            'currentStage' => $currentStage
+        ];
+    }
+
+
+
+
 
     /**
      * Execute the console command.
@@ -43,7 +108,7 @@ class RouletteTimer extends Command
     ['number' => 3, 'weight' => 1],
     ['number' => 12, 'weight' => 1],
     ['number' => 4, 'weight' => 1],
-    ['number' => 0, 'weight' => 0.1], // Very uncommon
+    ['number' => 0, 'weight' => 0.3], // Very uncommon
     ['number' => 11, 'weight' => 1],
     ['number' => 5, 'weight' => 1],
     ['number' => 10, 'weight' => 1],
@@ -69,12 +134,50 @@ return $weightedNumbers[$randomIndex];
     public function handle()
     {
         while (true) {
-            // Wait for 20 seconds before running again
-            $num = $this->weightedRandomRoulette();
-            RouletteService::dispatch($num);
-            $this->info("sent roulette event");
+            // first stage, countdown
 
-            sleep(30);
+            $this->info('Starting 15 second countdown');
+            $this->startTime = time();
+            $this->currentStage = 'countdown';
+            RouletteService::dispatch([
+                'countDown_msec' => 15000,
+                'currentStage' => $this->currentStage
+            ]);
+            // Store game result and start time in cache
+            Cache::put('roulette_start_time', $this->startTime);
+            Cache::put('current_game_stage', $this->currentStage);
+
+            sleep(15); // Wait for 15 seconds before running the next stage
+            // next stage, spin
+            $this->currentStage = 'spin';
+
+            $this->info('Starting spin');
+
+            $this->gameResult = $this->weightedRandomRoulette();
+            Cache::put('time_at_spin', time());
+
+            Cache::put('roulette_game_result', $this->gameResult);
+            Cache::put('current_game_stage', $this->currentStage);
+
+            RouletteService::dispatch([
+                'number' => $this->gameResult,
+                'currentStage' => $this->currentStage
+            ]);
+            sleep(6);
+            // last stage, result
+
+            $this->currentStage = 'result';
+            Cache::put('current_game_stage', $this->currentStage);
+
+            RouletteService::dispatch([
+                'gameResult' => $this->gameResult,
+                'currentStage' => $this->currentStage
+            ]);
+            sleep(6);
+
+
+
+
         }
     }
 }
