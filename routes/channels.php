@@ -17,3 +17,8 @@ Broadcast::channel('testChannel', function () {
     return true; // Adjust authorization logic as needed
 });
 
+
+Broadcast::channel('roulette', function () {
+    return Auth::check();
+});
+

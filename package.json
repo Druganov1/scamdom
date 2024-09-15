@@ -22,6 +22,8 @@
         "vite": "^5.0"
     },
     "dependencies": {
-        "react-toastify": "^10.0.5"
+        "matter-js": "^0.20.0",
+        "react-toastify": "^10.0.5",
+        "uuid": "^10.0.0"
     }
 }

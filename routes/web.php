@@ -33,6 +33,15 @@ Route::get('/wallet', function () {
     return Inertia::render('Profile/Wallet');
 })->middleware(['auth', 'verified'])->name('wallet');
 
+
+Route::prefix('games') // Prefix for all routes
+    ->middleware(['auth', 'verified']) // Middleware to apply
+    ->group(function () {
+        Route::get('/roulette', function () {
+            return Inertia::render('Games/Roulette');
+        });
+    });
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
