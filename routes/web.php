@@ -36,11 +36,12 @@ Route::get('/wallet', function () {
 
 
 Route::prefix('games') // Prefix for all routes
-    ->middleware(['auth', 'verified']) // Middleware to apply
+    ->middleware(['auth', 'verified'])
+    ->as('games.') // Middleware to apply
     ->group(function () {
         Route::get('/roulette', function () {
             return Inertia::render('Games/Roulette');
-        });
+        })->name('roulette');
     });
 
 Route::middleware('auth')->group(function () {

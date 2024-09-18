@@ -2,10 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Models\RoulletteHistory;
 use Illuminate\Console\Command;
 
 use App\Events\RouletteService;
 use Illuminate\Support\Facades\Cache;
+
 
 class RouletteTimer extends Command
 {
@@ -165,7 +167,12 @@ return $weightedNumbers[$randomIndex];
             ]);
             sleep(6);
             // last stage, result
-
+            $unhashed = $this->gameResult + time();
+            RoulletteHistory::create([
+                'number' => $this->gameResult,
+                'color' => $this->gameResult % 2 === 0 ? 'red' : 'black',
+                'hash' => md5($unhashed)
+            ]);
             $this->currentStage = 'result';
             Cache::put('current_game_stage', $this->currentStage);
 

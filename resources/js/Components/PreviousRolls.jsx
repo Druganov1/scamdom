@@ -1,0 +1,35 @@
+import React, { useState, useEffect } from 'react';
+
+
+
+export default function PreviousRolls() {
+
+    const [previousRolls, setPreviousRolls] = useState([]);
+
+    useEffect(() => {
+        // Mockup: Example to listen to the 'roulette' WebSocket channel
+        window.Echo.channel('roulette').listen('RouletteService', (e) => {
+          let data = e.data;
+          if (data.currentStage === 'result') {
+            console.log('result:', data);
+
+            // Assuming data contains the new roll number
+            setPreviousRolls((prevRolls) => [data.rollNumber, ...prevRolls]);
+          }
+        });
+      }, []);
+      return (
+        <div className="flex flex-row max-w-[400px] overflow-x-scroll scroll-smooth transition no-scrollbar mask-gradient gap-0">
+          {previousRolls.map((roll, index) => (
+            <div
+              key={index}
+              className={`h-[45px] w-[45px] min-w-[45px] m-[3px] rounded-full ${
+                roll === 0 ? 'roulette-green' : roll % 2 === 0 ? 'roulette-black' : 'roulette-red'
+              } flex items-center justify-center text-white text-lg`}
+            >
+              {roll}
+            </div>
+          ))}
+        </div>
+      );
+}

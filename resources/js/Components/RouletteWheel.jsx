@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import RouletteStopwatch from "./RouletteStopwatch";
 import SpinningNow from "./SpinningNow";
 import RouletteResult from "./RouletteResult";
+import PreviousRolls from "./PreviousRolls";
 
 const RouletteWheel = () => {
     const [showStopwatch, setShowStopwatch] = useState(false);
@@ -171,6 +172,9 @@ const RouletteWheel = () => {
             <div className="roulette-wrapper relative flex justify-center w-full mx-auto overflow-hidden">
                 <div className="w-[3px] bg-gray-500 h-full absolute left-1/2 z-10 -translate-x-1/2"></div>
                 <div ref={wheelRef} className="flex"></div>
+            </div>
+            <div className="flex flex-row justify-end w-full mt-10">
+                <PreviousRolls />
             </div>
         </div>
     );

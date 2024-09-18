@@ -27,11 +27,11 @@ export default function GamesCatalog() {
 
                         Crash
                     </button>
-                    <button className="bg-roulette text-white py-12 h-12 px-9 rounded-lg flex items-center justify-center text-2xl transition-transform duration-200 hover:-translate-y-1 ">
+                    <Link href={route('games.roulette')} className="bg-roulette text-white py-12 h-12 px-9 rounded-lg flex items-center justify-center text-2xl transition-transform duration-200 hover:-translate-y-1 ">
                     <i className="fa-light fa-chess-rook p-3"></i>
 
                         Roulette
-                    </button>
+                    </Link>
                     <button className="bg-hilo text-white py-12 h-12 px-9 rounded-lg flex items-center justify-center text-2xl transition-transform duration-200 hover:-translate-y-1">
                     <i className="fa-light fa-chess-rook p-3"></i>
 
