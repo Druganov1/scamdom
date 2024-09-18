@@ -10,10 +10,9 @@ const RouletteWheel = () => {
     const [landed, setLanded] = useState(false);
     const [slot, setSlot] = useState(0);
     const [countdown, setCountdown] = useState(0);
+    const [lastRolls, setLastRolls] = useState([]);
 
     const wheelRef = useRef(null);
-
-    // Initializes the wheel and sets up the Echo listener
     useEffect(() => {
         initWheel();
 
@@ -22,7 +21,7 @@ const RouletteWheel = () => {
         axios.post(route('api.roulette-init'))
             .then(response => {
             const data = response.data;
-            console.log('Initial data:', data);
+            setLastRolls(data.last_rolls);
 
             if (data.currentStage === 'countdown') {
                 setCountdown(data.remainingTime);
@@ -40,6 +39,7 @@ const RouletteWheel = () => {
             } else if (data.currentStage === 'result') {
                 setSlot(data.gameResult);
                 spinWheel(data.gameResult, 0);
+                setSpinning(false);
 
                 setLanded(true);
             }
@@ -85,6 +85,7 @@ const RouletteWheel = () => {
         const wheel = wheelRef.current;
         const rows = generateRows();
         wheel.innerHTML = rows.repeat(29);
+
     };
 
     // Generates the row HTML for the roulette wheel
@@ -174,7 +175,7 @@ const RouletteWheel = () => {
                 <div ref={wheelRef} className="flex"></div>
             </div>
             <div className="flex flex-row justify-end w-full mt-10">
-                <PreviousRolls />
+                <PreviousRolls rolls={lastRolls}/>
             </div>
         </div>
     );
