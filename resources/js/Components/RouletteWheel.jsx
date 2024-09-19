@@ -78,6 +78,10 @@ const RouletteWheel = () => {
             }
         });
 
+        return () => {
+            channel.stopListening('WalletBalanceUpdated');
+          };
+
     }, []);
 
     // Function to initialize the wheel
@@ -170,9 +174,9 @@ const RouletteWheel = () => {
             </div>
 
 
-            <div className="roulette-wrapper relative flex justify-center w-full mx-auto overflow-hidden">
-                <div className="w-[3px] bg-gray-500 h-full absolute left-1/2 z-10 -translate-x-1/2"></div>
-                <div ref={wheelRef} className="flex"></div>
+            <div className="roulette-wrapper relative flex justify-center w-full mx-auto overflow-hidden mask-gradient-spinner">
+                <div className="w-[3px] bg-gray-500 h-full absolute left-1/2 z-10 -translate-x-1/2 "></div>
+                <div ref={wheelRef} className="flex "></div>
             </div>
             <div className="flex flex-row justify-end w-full mt-10">
                 <PreviousRolls rolls={lastRolls}/>

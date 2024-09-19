@@ -6,24 +6,38 @@ import { ToastContainer, toast } from 'react-toastify';
 
 export default function Wallet({ auth }) {
 
-    const notify = () => toast.success('Saldo opgewaardeerd!', {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        });
 
 
 
         const addFunds = async (amount) => {
             try {
-                const response = await axios.post('/api/add-funds', { amount });
+                const response = await axios.post('/api/add-funds', { amount },    {
+                    validateStatus: function (status) {
+                        return status >= 200 && status < 500; // Accept status codes from 200 to 499
+                    }
+                });
                 if (response.status === 200) {
-                    notify();
+                    toast.success(response.data.message, {
+                        position: "top-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                        });
+                } else if (response.status === 403) {
+                    toast.error(response.data.message, {
+                        position: "top-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                    });
                 }
             } catch (error) {
                 console.error('Error adding funds:', error);

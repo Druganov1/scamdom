@@ -35,6 +35,12 @@ body {
     scrollbar-width: none;  /* Firefox */
 }
 .mask-gradient {
-    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-  }
+mask-image: linear-gradient(to right, black, black 90%, transparent 100%);
+-webkit-mask-image: linear-gradient(to right, black, black 90%, transparent 100%);
+}
+
+.mask-gradient-spinner {
+mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+-webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
