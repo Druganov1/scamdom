@@ -13,5 +13,7 @@ export default function Dashboard({ auth }) {
 
         <GamesCatalog />
         </AuthenticatedLayout>
+
+
     );
 }
