@@ -42,6 +42,9 @@ Route::prefix('games') // Prefix for all routes
         Route::get('/roulette', function () {
             return Inertia::render('Games/Roulette');
         })->name('roulette');
+        Route::get('/mines', function () {
+            return Inertia::render('Games/Mines');
+        })->name('mines');
     });
 
 Route::middleware('auth')->group(function () {
@@ -60,6 +63,7 @@ Route::prefix('api') // Prefix for all routes
     });
 
 //API ROUTES
+
 
 
 require __DIR__.'/auth.php';
