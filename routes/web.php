@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Events\testEvent;
 use App\Http\Controllers\BalanceController;
 use App\Console\Commands\RouletteTimer;
+use App\Http\Controllers\Games\MinesweeperController;
 
 Route::get('/test-broadcast', function () {
     testEvent::dispatch();
@@ -45,7 +46,7 @@ Route::prefix('games') // Prefix for all routes
         Route::get('/mines', function () {
             return Inertia::render('Games/Mines');
         })->name('mines');
-    });
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -59,6 +60,8 @@ Route::prefix('api') // Prefix for all routes
     ->group(function () {
         Route::post('/add-funds', [BalanceController::class, 'addFunds'])->name('api.addfunds');
         Route::post('/roulette/init', [RouletteTimer::class, 'init'])->name('api.roulette-init');
+        Route::post('/minesweeper/start', [MinesweeperController::class, 'StartGame'])->name('api.mineweeper-start');
+        Route::post('/minesweeper/clicktile', [MinesweeperController::class, 'ClickedTile'])->name('api.click-tile');
 
     });
 
