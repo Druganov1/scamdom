@@ -10,6 +10,11 @@ export default function MinesGame() {
 
     const [tiles, setTiles] = useState(Array(25).fill(null)); // Array to store tile type (null, 'gem', 'mine')
     const [bustedTileIndex, setBustedTile] = useState(0);
+    const [gameStatus, setGameStatus] = useState("pending");
+    const [betAmount, setBetAmount] = useState(0);
+    const [mines, setMines] = useState(0);
+    const [gems, setGems] = useState(0);
+    const [winAmount, setWinAmount] = useState(0);
 
     function startGame(e) {
         e.preventDefault();
@@ -17,7 +22,13 @@ export default function MinesGame() {
         const data = new FormData(e.target);
 
         axios.post(route("api.mineweeper-start"), data).then((response) => {
-            console.log(response.data);
+            let input = response.data.input;
+            setBustedTile(0); // Reset busted tile
+            setTiles(Array(25).fill(null)); // Reset all tiles
+            setGameStatus("running");
+            setBetAmount(input);
+            setMines(response.data.mines);
+            setGems(response.data.gems);
         });
     }
 
@@ -32,6 +43,8 @@ export default function MinesGame() {
             // Check if the tile clicked is a mine
             if (tileType === "mine") {
                 // If a mine is hit, reveal all tiles
+                setGameStatus("pending");
+
                 setBustedTile(tileNumber); // Set the busted tile number
                 const updatedTiles = Array(25).fill(null); // Assuming there are 25 tiles total
                 allTilePositions.forEach(({ type, tile_number }) => {
@@ -41,6 +54,9 @@ export default function MinesGame() {
                 Mineaudio.play(); // Play mine sound
             } else {
                 // Update the specific tile with its type if it's not a mine
+                setWinAmount(response.data.total_profit);
+
+                setGems(gems - 1); // Decrement gems
                 setTiles((prevTiles) =>
                     prevTiles.map((tile, index) =>
                         index + 1 === tileNumber ? tileType : tile
@@ -66,39 +82,112 @@ export default function MinesGame() {
 
     return (
         <div className="bg-slate-800 rounded-lg flex-col-reverse md:flex-row flex w-11/12 lg:w-9/12 mx-auto">
-            <form
-                onSubmit={startGame}
-                className="flex flex-col text-white text-sm rounded-b-lg lg:rounded-l-lg lg:rounded-br-none  bg-slate-700 p-3"
-            >
-                <label htmlFor="bet_input" className="mb-1">
-                    Bet amount
-                </label>
-
-                <input
-                    className="bg-slate-900 rounded-sm mb-3"
-                    type="number"
-                    name="bet_input"
-                    id=""
-                />
-
-                <label htmlFor="mines_input" className="mb-1">
-                    Mines
-                </label>
-
-                <input
-                    className="bg-slate-900 rounded-sm mb-3"
-                    type="number"
-                    name="mines_input"
-                    id=""
-                />
-
-                <button
-                    type="submit"
-                    className="bg-scamdom-primary text-black w-full rounded-sm p-4"
+            {gameStatus === "running" && (
+                <form
+                    onSubmit={startGame}
+                    className="flex flex-col text-white text-sm rounded-b-lg lg:rounded-l-lg lg:rounded-br-none max-w-xs bg-slate-700 p-3"
                 >
-                    Bet
-                </button>
-            </form>
+                    <label htmlFor="bet_input" className="mb-1">
+                        Bet amount
+                    </label>
+
+                    <input
+                        className="bg-slate-900 rounded-sm mb-3"
+                        name="bet_input"
+                        value={betAmount}
+                        disabled
+                    />
+                    <div className="flex space-x-4">
+                        <div className="flex-1">
+                            <label htmlFor="gems" className="mb-1 block">
+                                Gems
+                            </label>
+                            <input
+                                className="bg-slate-900 rounded-sm mb-3 block w-full"
+                                disabled
+                                value={gems}
+                                name="gems"
+                                id="gems"
+                            />
+                        </div>
+                        <div className="flex-1">
+                            <label htmlFor="mines_input" className="mb-1 block">
+                                Mines
+                            </label>
+                            <input
+                                className="bg-slate-900 rounded-sm mb-3 block w-full"
+                                disabled
+                                value={mines}
+                                name="mines_input"
+                                id="mines_input"
+                            />
+                        </div>
+                    </div>
+                    <label htmlFor="win_amount" className="mb-1">
+                        Total profit
+                    </label>
+
+                    <input
+                        className="bg-slate-900 rounded-sm mb-3"
+                        name="win_amount"
+                        value={winAmount}
+                        disabled
+                    />
+                    <button
+                        type="submit"
+                        className="bg-scamdom-primary text-black w-full rounded-sm p-4"
+                    >
+                        Cash out
+                    </button>
+                </form>
+            )}
+            {gameStatus === "pending" && (
+                <form
+                    onSubmit={startGame}
+                    className="flex flex-col text-white text-sm rounded-b-lg lg:rounded-l-lg lg:rounded-br-none  bg-slate-700 p-3"
+                >
+                    <label htmlFor="bet_input" className="mb-1">
+                        Bet amount
+                    </label>
+
+                    <input
+                        className="bg-slate-900 rounded-sm mb-3"
+                        type="number"
+                        name="bet_input"
+                        id=""
+                    />
+
+                    <label htmlFor="mines_input" className="mb-1">
+                        Mines
+                    </label>
+
+                    {/* <input
+                        className="bg-slate-900 rounded-sm mb-3"
+                        type="number"
+                        name="mines_input"
+                        id=""
+                    /> */}
+                    <select
+                        className="bg-slate-900 rounded-sm mb-3"
+                        name="mines_input"
+                        type="number"
+                        id=""
+                    >
+                        {Array.from({ length: 24 }, (_, index) => (
+                            <option key={index + 1} value={index + 1}>
+                                {index + 1}
+                            </option>
+                        ))}
+                    </select>
+
+                    <button
+                        type="submit"
+                        className="bg-scamdom-primary text-black w-full rounded-sm p-4"
+                    >
+                        Bet
+                    </button>
+                </form>
+            )}
 
             <div className="mx-auto my-auto">
                 <div className="grid grid-rows-5 grid-cols-5 gap-3">

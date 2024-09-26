@@ -55,7 +55,7 @@ class MinesweeperController extends Controller
         // first we need to validate the request
         $request->validate([
             'bet_input' => 'required|numeric|min:0.01',
-            'mines_input' => 'required|integer|min:1|max:24',
+            'mines_input' => 'required|min:1|max:24',
         ]);
 
 
@@ -79,8 +79,32 @@ class MinesweeperController extends Controller
 
         return response()->json([
             'hash' => $game->hash,
+            'input' => $request->input('bet_input'),
+            'mines' => $request->input('mines_input'),
+            'gems' => (25 - $request->input('mines_input')),
         ]);
     }
+    public function calculateWinAmount($clickedSafeTiles, $initialBet, $totalTiles, $minesCount) {
+        // Ensure we don't divide by zero
+        if ($totalTiles - $minesCount <= 0) {
+            return 0; // No valid tiles left
+        }
+
+        // Base multiplier can be defined; for example, we can set it to 1
+        $baseMultiplier = 1;
+
+        // Calculate the multiplier
+        $multiplier = ($clickedSafeTiles + $baseMultiplier) / ($totalTiles - $minesCount);
+
+        // Calculate the win amount
+        $winAmount = $initialBet * $multiplier;
+
+        return $winAmount;
+    }
+
+
+
+
 
 
     public function ClickedTile(Request $request) {
@@ -129,7 +153,14 @@ class MinesweeperController extends Controller
             $game->status = 'busted';
             $game->win_amount = 0;
             $game->payout_multiplier = 0;
+            $game->last_activity_at = now();
 
+            $game->save();
+            return response()->json([
+                'tile_result' => $tileType,
+                'all_tiles' => $game->mine_positions,
+
+            ]);
         }
 
         // Update the last activity timestamp
@@ -138,16 +169,12 @@ class MinesweeperController extends Controller
         // Optionally, save the game state if needed
         $game->save();
 
-        if ($game->status === 'busted') {
-            Cache::forget('minesweeper_game_' . auth()->id());
-            return response()->json([
-                'tile_result' => $tileType,
-                'all_tiles' => $game->mine_positions,
+        $totalProfit = $this->calculateWinAmount(count($game->revealed_positions), $game->bet_amount, 25, $game->mines);
 
-            ]);
-        }
         return response()->json([
             'tile_result' => $tileType,
+            'total_profit' => $totalProfit,
+            'clicked' => count($game->revealed_positions),
         ]);
     }
 }
