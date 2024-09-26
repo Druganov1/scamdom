@@ -84,24 +84,38 @@ class MinesweeperController extends Controller
             'gems' => (25 - $request->input('mines_input')),
         ]);
     }
-    public function calculateWinAmount($clickedSafeTiles, $initialBet, $totalTiles, $minesCount) {
-        // Ensure we don't divide by zero
-        if ($totalTiles - $minesCount <= 0) {
-            return 0; // No valid tiles left
+
+    public function factorial($n) {
+        if ($n <= 1) {
+            return 1;
         }
-
-        // Base multiplier can be defined; for example, we can set it to 1
-        $baseMultiplier = 1;
-
-        // Calculate the multiplier
-        $multiplier = ($clickedSafeTiles + $baseMultiplier) / ($totalTiles - $minesCount);
-
-        // Calculate the win amount
-        $winAmount = $initialBet * $multiplier;
-
-        return $winAmount;
+        return $n * $this->factorial($n - 1);
     }
 
+    // Combination function C(n, k) = n! / (k! * (n - k)!)
+    public function combination($n, $k) {
+        return $this->factorial($n) / ($this->factorial($k) * $this->factorial($n - $k));
+    }
+
+    // Updated multiplier function
+// Updated multiplier function with scaling factor and formatting
+public function getWinMultiplier($mines, $tilesClicked) {
+    $totalTiles = 25;  // Total number of tiles in the grid (5x5)
+    $safeTiles = $totalTiles - $mines;  // Initial safe tiles
+
+    // Calculate the probability of success with the remaining safe tiles
+    $multiplier = $this->combination($safeTiles, $tilesClicked) / $this->combination($totalTiles, $tilesClicked);
+
+    // Inverse of the probability of success
+    $winMultiplier = 1 / $multiplier;
+
+    // Apply a scaling factor to render the multiplier down
+    $scalingFactor = 0.99; // Adjust this factor to decrease the multiplier slightly
+    $winMultiplier *= $scalingFactor;
+
+    // Round down to 2 decimal places
+    return floor($winMultiplier * 100) / 100.0; // Return as a float
+}
 
 
 
@@ -168,13 +182,17 @@ class MinesweeperController extends Controller
 
         // Optionally, save the game state if needed
         $game->save();
+        $winMultiplier = $this->getWinMultiplier($game->mines, count($game->revealed_positions));
 
-        $totalProfit = $this->calculateWinAmount(count($game->revealed_positions), $game->bet_amount, 25, $game->mines);
+
+        $multiplier = $game->bet_amount * $winMultiplier;
+        $totalProfit = round($multiplier-$game->bet_amount, 2);
+
 
         return response()->json([
             'tile_result' => $tileType,
             'total_profit' => $totalProfit,
-            'clicked' => count($game->revealed_positions),
+            'winMultiplier' => $winMultiplier,
         ]);
     }
 }

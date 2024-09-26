@@ -15,6 +15,8 @@ export default function MinesGame() {
     const [mines, setMines] = useState(0);
     const [gems, setGems] = useState(0);
     const [winAmount, setWinAmount] = useState(0);
+    const [winMultiplier, setWinMultiplier] = useState(0);
+    const [cashedOut, setCashedOut] = useState(false);
 
     function startGame(e) {
         e.preventDefault();
@@ -29,6 +31,7 @@ export default function MinesGame() {
             setBetAmount(input);
             setMines(response.data.mines);
             setGems(response.data.gems);
+            setWinMultiplier(0);
         });
     }
 
@@ -55,6 +58,7 @@ export default function MinesGame() {
             } else {
                 // Update the specific tile with its type if it's not a mine
                 setWinAmount(response.data.total_profit);
+                setWinMultiplier(response.data.winMultiplier);
 
                 setGems(gems - 1); // Decrement gems
                 setTiles((prevTiles) =>
@@ -124,7 +128,7 @@ export default function MinesGame() {
                         </div>
                     </div>
                     <label htmlFor="win_amount" className="mb-1">
-                        Total profit
+                        Total profit ({winMultiplier}×)
                     </label>
 
                     <input
@@ -161,12 +165,6 @@ export default function MinesGame() {
                         Mines
                     </label>
 
-                    {/* <input
-                        className="bg-slate-900 rounded-sm mb-3"
-                        type="number"
-                        name="mines_input"
-                        id=""
-                    /> */}
                     <select
                         className="bg-slate-900 rounded-sm mb-3"
                         name="mines_input"
@@ -189,8 +187,19 @@ export default function MinesGame() {
                 </form>
             )}
 
-            <div className="mx-auto my-auto">
-                <div className="grid grid-rows-5 grid-cols-5 gap-3">
+            <div className="mx-auto my-auto relative">
+                {cashedOut && (
+                    <div className="bg-slate-700 py-2 px-10 rounded-lg z-10 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-2 border-scamdom-primary text-scamdom-primary flex flex-col  items-center gap-1">
+                        <h3 className="text-2xl">{winMultiplier}×</h3>
+                        <div className="border border-slate-500 w-5 rounded-lg"></div>
+                        <p className="text-xs">${winAmount}</p>
+                    </div>
+                )}
+                <div
+                    className={`grid grid-rows-5 grid-cols-5 gap-3 ${
+                        cashedOut ? "opacity-50 blur-sm" : ""
+                    }`}
+                >
                     {Array.from({ length: 25 }, (_, index) => (
                         <button
                             key={index}
