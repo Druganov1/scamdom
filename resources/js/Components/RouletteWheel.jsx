@@ -14,64 +14,67 @@ const RouletteWheel = () => {
 
     const wheelRef = useRef(null);
     useEffect(() => {
+        if (!Echo || !Echo.channel) {
+            console.error("Echo or channel is not defined.");
+            return;
+        }
+
         initWheel();
 
+        axios
+            .post(route("api.roulette-init"))
+            .then((response) => {
+                const data = response.data;
+                setLastRolls(data.last_rolls);
 
+                if (data.currentStage === "countdown") {
+                    setCountdown(data.remainingTime);
+                    console.log("countdown:", data.remainingTime);
+                    setShowStopwatch(true);
+                } else if (data.currentStage === "spin") {
+                    let now = Date.now();
+                    let time = now - data.timeAtSpin * 1000;
+                    let spintime = 6000 - time;
 
-        axios.post(route('api.roulette-init'))
-            .then(response => {
-            const data = response.data;
-            setLastRolls(data.last_rolls);
+                    spinWheel(data.gameResult, spintime);
+                    setSpinning(true);
+                    setSlot(data.gameResult);
+                } else if (data.currentStage === "result") {
+                    setSlot(data.gameResult);
+                    spinWheel(data.gameResult, 0);
+                    setSpinning(false);
 
-            if (data.currentStage === 'countdown') {
-                setCountdown(data.remainingTime);
-                console.log('countdown:', data.remainingTime);
-                setShowStopwatch(true);
-            } else if (data.currentStage === 'spin') {
-                let now = Date.now();
-                let time = now - (data.timeAtSpin*1000);
-                let spintime = 6000 - time
+                    setLanded(true);
+                }
 
+                // this is for people who just joined and the game is going, so they can see the current state
 
-                spinWheel(data.gameResult, spintime);
-                setSpinning(true);
-                setSlot(data.gameResult);
-            } else if (data.currentStage === 'result') {
-                setSlot(data.gameResult);
-                spinWheel(data.gameResult, 0);
-                setSpinning(false);
-
-                setLanded(true);
-            }
-
-            // this is for people who just joined and the game is going, so they can see the current state
-
-            // availible parameters: currentStage, countDown_msec, gameResult
+                // availible parameters: currentStage, countDown_msec, gameResult
             })
-            .catch(error => console.error('Error fetching init data:', error));
+            .catch((error) =>
+                console.error("Error fetching init data:", error)
+            );
 
-        window.Echo.channel('roulette').listen('RouletteService', (e) => {
+        const channel = Echo.channel("roulette");
+
+        channel.listen("RouletteService", (e) => {
             let data = e.data;
             switch (data.currentStage) {
-                case 'countdown':
+                case "countdown":
                     setCountdown(data.countDown_msec);
                     setShowStopwatch(true);
                     setLanded(false);
 
-
                     break;
-                case 'spin':
-
+                case "spin":
                     setShowStopwatch(false);
                     spinWheel(data.number, 6000);
                     setSpinning(true);
                     setSlot(data.number);
                     break;
-                case 'result':
+                case "result":
                     setLanded(true);
                     setSpinning(false);
-
-
 
                 default:
                     break;
@@ -79,9 +82,8 @@ const RouletteWheel = () => {
         });
 
         return () => {
-            channel.stopListening('WalletBalanceUpdated');
-          };
-
+            channel.stopListening("RouletteService");
+        };
     }, []);
 
     // Function to initialize the wheel
@@ -89,7 +91,6 @@ const RouletteWheel = () => {
         const wheel = wheelRef.current;
         const rows = generateRows();
         wheel.innerHTML = rows.repeat(29);
-
     };
 
     // Generates the row HTML for the roulette wheel
@@ -102,28 +103,32 @@ const RouletteWheel = () => {
     // Generates individual cell HTML
     const generateCells = () => {
         const cells = [
-            { color: 'red', number: 1 },
-            { color: 'black', number: 14 },
-            { color: 'red', number: 2 },
-            { color: 'black', number: 13 },
-            { color: 'red', number: 3 },
-            { color: 'black', number: 12 },
-            { color: 'red', number: 4 },
-            { color: 'green', number: 0 },
-            { color: 'black', number: 11 },
-            { color: 'red', number: 5 },
-            { color: 'black', number: 10 },
-            { color: 'red', number: 6 },
-            { color: 'black', number: 9 },
-            { color: 'red', number: 7 },
-            { color: 'black', number: 8 },
+            { color: "red", number: 1 },
+            { color: "black", number: 14 },
+            { color: "red", number: 2 },
+            { color: "black", number: 13 },
+            { color: "red", number: 3 },
+            { color: "black", number: 12 },
+            { color: "red", number: 4 },
+            { color: "green", number: 0 },
+            { color: "black", number: 11 },
+            { color: "red", number: 5 },
+            { color: "black", number: 10 },
+            { color: "red", number: 6 },
+            { color: "black", number: 9 },
+            { color: "red", number: 7 },
+            { color: "black", number: 8 },
         ];
 
-        return cells.map(({ color, number }) => `
+        return cells
+            .map(
+                ({ color, number }) => `
             <div class="h-[75px] w-[75px] m-[3px] rounded-lg roulette-${color} flex items-center justify-center text-white text-2xl">
                 ${number}
             </div>
-        `).join('');
+        `
+            )
+            .join("");
     };
 
     // Function to spin the wheel
@@ -160,26 +165,25 @@ const RouletteWheel = () => {
             wheel.style.transitionDuration = "";
             const resetTo = -(position * cardSize + randomize);
             wheel.style.transform = `translate3d(${resetTo}px, 0px, 0px)`;
-
-
         }, spintime);
     };
 
     return (
         <div className="flex flex-col items-center">
             <div className="mb-10 text-white">
-                {showStopwatch && <RouletteStopwatch  initialTimeInMilliseconds={countdown} />}
+                {showStopwatch && (
+                    <RouletteStopwatch initialTimeInMilliseconds={countdown} />
+                )}
                 {spinningNow && <SpinningNow />}
                 {landed && <RouletteResult result={slot} />}
             </div>
-
 
             <div className="roulette-wrapper relative flex justify-center w-full mx-auto overflow-hidden mask-gradient-spinner">
                 <div className="w-[3px] bg-gray-500 h-full absolute left-1/2 z-10 -translate-x-1/2 "></div>
                 <div ref={wheelRef} className="flex "></div>
             </div>
             <div className="flex flex-row justify-end w-full mt-10">
-                <PreviousRolls rolls={lastRolls}/>
+                <PreviousRolls rolls={lastRolls} />
             </div>
         </div>
     );

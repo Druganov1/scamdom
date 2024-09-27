@@ -35,6 +35,10 @@ export default function MinesGame() {
         });
     }
 
+    const cashOut = async (e) => {
+        setCashedOut(true);
+    };
+
     const clickTile = async (tileNumber) => {
         try {
             const response = await axios.post(route("api.click-tile"), {
@@ -138,7 +142,7 @@ export default function MinesGame() {
                         disabled
                     />
                     <button
-                        type="submit"
+                        onClick={cashOut}
                         className="bg-scamdom-primary text-black w-full rounded-sm p-4"
                     >
                         Cash out
