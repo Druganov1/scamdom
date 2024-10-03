@@ -5,10 +5,10 @@ import { useEffect } from "react";
 export default function GamesCatalog() {
     return (
         <div className="py-12">
-            <div className="bg-background p-6">
-                <h1 className="text-2xl font-bold text-white mb-4">
+            <div className="p-6 bg-background">
+                <h1 className="mb-4 text-2xl font-bold text-white">
                     <i
-                        className="fa-solid fa-chess-rook mr-3"
+                        className="mr-3 fa-solid fa-chess-rook"
                         style={{ color: "#06bf67" }}
                     ></i>
                     Scamdom Originals
@@ -16,31 +16,46 @@ export default function GamesCatalog() {
                 <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-[15px]">
                     <Link
                         href={route("games.mines")}
-                        className="bg-slot text-white py-12 h-12 px-9 rounded-lg flex items-center justify-center text-2xl transition-transform duration-200 hover:-translate-y-1"
+                        className="flex items-center justify-center h-12 py-12 text-2xl text-white transition-transform duration-200 rounded-lg bg-slot px-9 hover:-translate-y-1"
                     >
-                        <i className="fa-light fa-chess-rook p-3"></i>
+                        <i className="p-3 fa-light fa-chess-rook"></i>
                         Mines
                     </Link>
 
-                    <button className="bg-plinko text-white py-12 h-12 px-9 rounded-lg flex items-center justify-center text-2xl transition-transform duration-200 hover:-translate-y-1 ">
-                        <i className="fa-light fa-chess-rook p-3"></i>
+                    <div className="relative flex items-center justify-center h-12 py-12 text-2xl text-white transition-transform duration-200 rounded-lg cursor-not-allowed bg-plinko px-9">
+                        <i className="p-3 fa-light fa-chess-rook"></i>
                         Plinko
-                    </button>
-                    <button className="bg-crash text-white py-12 h-12 px-9 rounded-lg flex items-center justify-center text-2xl transition-transform duration-200 hover:-translate-y-1 ">
-                        <i className="fa-light fa-chess-rook p-3"></i>
+                        <div className="absolute flex flex-col justify-center w-full h-full bg-gray-400 bg-opacity-50 rounded-xl ">
+                            <p className="font-semibold text-center text-black">
+                                Unavailible
+                            </p>
+                        </div>
+                    </div>
+                    <div className="relative flex items-center justify-center h-12 py-12 text-2xl text-white transition-transform duration-200 rounded-lg cursor-not-allowed bg-crash px-9">
+                        <i className="p-3 fa-light fa-chess-rook"></i>
                         Crash
-                    </button>
+                        <div className="absolute flex flex-col justify-center w-full h-full bg-gray-400 bg-opacity-50 rounded-xl ">
+                            <p className="font-semibold text-center text-black">
+                                Unavailible
+                            </p>
+                        </div>
+                    </div>
                     <Link
                         href={route("games.roulette")}
-                        className="bg-roulette text-white py-12 h-12 px-9 rounded-lg flex items-center justify-center text-2xl transition-transform duration-200 hover:-translate-y-1 "
+                        className="flex items-center justify-center h-12 py-12 text-2xl text-white transition-transform duration-200 rounded-lg bg-roulette px-9 hover:-translate-y-1 "
                     >
-                        <i className="fa-light fa-chess-rook p-3"></i>
+                        <i className="p-3 fa-light fa-chess-rook"></i>
                         Roulette
                     </Link>
-                    <button className="bg-hilo text-white py-12 h-12 px-9 rounded-lg flex items-center justify-center text-2xl transition-transform duration-200 hover:-translate-y-1">
-                        <i className="fa-light fa-chess-rook p-3"></i>
+                    <div className="relative flex items-center justify-center h-12 py-12 text-2xl text-white transition-transform duration-200 rounded-lg cursor-not-allowed bg-hilo px-9">
+                        <i className="p-3 fa-light fa-chess-rook"></i>
                         HiLo
-                    </button>
+                        <div className="absolute flex flex-col justify-center w-full h-full bg-gray-400 bg-opacity-50 rounded-xl ">
+                            <p className="font-semibold text-center text-black">
+                                Unavailible
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
