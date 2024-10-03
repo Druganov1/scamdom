@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
 import { Head } from '@inertiajs/react';
 import YourBet from "@/Components/YourBet.jsx";
+import {BettingContainers} from "@/Components/BettingContainers.jsx";
 
 export default function Edit({ auth, mustVerifyEmail, status }) {
     return (
@@ -16,7 +17,11 @@ export default function Edit({ auth, mustVerifyEmail, status }) {
                 <RouletteWheel></RouletteWheel>
                 </div>
 
-            <YourBet></YourBet>
+            <div className="py-8">
+                <YourBet></YourBet>
+            </div>
+
+            <BettingContainers></BettingContainers>
 
         </AuthenticatedLayout>
     );

@@ -4,7 +4,7 @@ import React from "react";
 
 export default function YourBet() {
     return (
-            <div className="items-center space-x-2 bg-scamdom-40 rounded-lg px-4 py-2 flex justify-center">
+            <div className="items-center space-x-2 bg-scamdom-40 rounded-lg py-2 flex justify-center grid-cols-5">
                 <label className="text-gray-400 text-xs">Your bet</label>
                 <div className="flex items-center space-x-1 text-white">
                     <div className="relative">
