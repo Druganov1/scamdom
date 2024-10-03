@@ -7,7 +7,6 @@ export default function YourBet() {
     const user = useContext(UserContext);
 
     const [betAmount, setBetAmount] = useState("0.00");
-    const [userBalance, setUserBalance] = useState(500); // Standaard waarde voor de gebruikersbalans (vervang dit met de echte waarde uit UserBalance)
 
     const addToBet = (amount) => {
         setBetAmount((prevAmount) =>
@@ -46,7 +45,7 @@ export default function YourBet() {
                         className="w-full px-4 py-2 text-white transition duration-500 border-transparent bg-scamdom-30 focus:ring-transparent focus:border-scamgreen-30 rounded-xl hover:border-scamgreen-30"
                     />
                     <button
-                        className="absolute bg-scamdom-40 rounded-xl right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 text-white hover:text-scamgreen-30 transition duration-500"
+                        className="active:scale-90 transition duration-110 absolute bg-scamdom-40 rounded-xl right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 text-white hover:text-scamgreen-30 transition duration-500"
                         onClick={clearBet} // Clear bet amount
                     >
                         Clear
@@ -56,37 +55,37 @@ export default function YourBet() {
 
             <div className="grid w-full grid-cols-3 gap-2 px-4 lg:px-0 lg:justify-center lg:items-center lg:flex lg:flex-wrap">
                 <button
-                    className="px-6 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
+                    className="px-6 active:scale-90 transition duration-110 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
                     onClick={() => addToBet(10)}
                 >
                     +$10
                 </button>
                 <button
-                    className="px-6 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
+                    className="px-6 active:scale-90 transition duration-110 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
                     onClick={() => addToBet(50)}
                 >
                     +$50
                 </button>
                 <button
-                    className="px-6 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
+                    className="px-6 active:scale-90 transition duration-110 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
                     onClick={() => addToBet(100)}
                 >
                     +$100
                 </button>
                 <button
-                    className="px-6 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
+                    className="px-6 active:scale-90 transition duration-110 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
                     onClick={() => setBetAmount((betAmount / 2).toFixed(2))}
                 >
                     1/2
                 </button>
                 <button
-                    className="px-6 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
+                    className="px-6 active:scale-90 transition duration-110 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
                     onClick={() => setBetAmount((betAmount * 2).toFixed(2))}
                 >
                     x2
                 </button>
                 <button
-                    className="px-6 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
+                    className="px-6 active:scale-90 transition duration-110 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
                     onClick={setMaxBet}
                 >
                     Max
