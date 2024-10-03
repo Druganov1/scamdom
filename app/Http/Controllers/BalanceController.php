@@ -47,4 +47,10 @@ class BalanceController extends Controller
 
         return response()->json(['message' => 'Saldo opgewaardeerd!'], 200);
     }
+
+    public function getUserBalance(){
+
+        $user = Auth::user();
+        return $user->balance;
+    }
 }

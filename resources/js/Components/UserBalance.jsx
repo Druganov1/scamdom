@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
-
-export default function UserBalance({user}) {
+export default function UserBalance({ user }) {
     const [balance, setBalance] = useState(0);
 
-    function formatCurrency(amount, locale = 'nl-NL') {
+    function formatCurrency(amount, locale = "nl-NL") {
         const options = {
-            style: 'decimal',
+            style: "decimal",
             minimumFractionDigits: amount < 100 ? 2 : 0,
             maximumFractionDigits: amount < 100 ? 2 : 0,
         };
@@ -14,20 +14,36 @@ export default function UserBalance({user}) {
         return new Intl.NumberFormat(locale, options).format(amount);
     }
 
-
     useEffect(() => {
-        setBalance(formatCurrency(user.balance))
+        setBalance(formatCurrency(user.balance));
 
-        window.Echo.private(`wallet-balance.${user.id}`).listen('WalletBalanceUpdated', (e) => {
-            let num = e.balance;
+        window.Echo.private(`wallet-balance.${user.id}`).listen(
+            "WalletBalanceUpdated",
+            (e) => {
+                let num = e.balance;
 
-
-            setBalance(formatCurrency(num));
-        });
-
+                setBalance(formatCurrency(num));
+            }
+        );
     }, []);
 
-    return (
-            <>{balance}</>
-    );
+    return <>{balance}</>;
+}
+
+export function GetUserBalance(user) {
+    let balance;
+
+    axios
+        .get(route("api.getBalance"))
+        .then(function (response) {
+            // handle success
+            console.log(response);
+        })
+        .catch(function (error) {
+            // handle error
+            console.log(error);
+        })
+        .finally(function () {
+            // always executed
+        });
 }
