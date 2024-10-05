@@ -25,6 +25,7 @@ export default {
                     50: "#0b131b",
                     90: "#0a1119",
                     primary: "#00e701",
+                    chat: "#131a22",
                 },
                 roulette: {
                     red: "rgb(236, 75, 63)",

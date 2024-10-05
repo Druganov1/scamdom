@@ -6,6 +6,7 @@ use App\Models\Deposits;
 use Illuminate\Http\Request;
 use App\Events\WalletBalanceUpdated;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class BalanceController extends Controller
 {
@@ -51,6 +52,8 @@ class BalanceController extends Controller
     public function getUserBalance(){
 
         $user = Auth::user();
-        return $user->balance;
+        return [
+            "balance" => $user->balance
+        ];
     }
 }

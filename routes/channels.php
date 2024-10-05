@@ -22,3 +22,7 @@ Broadcast::channel('roulette', function () {
     return Auth::check();
 });
 
+Broadcast::channel('LiveChat', function () {
+    return Auth::check();
+});
+

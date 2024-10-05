@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import UserBalance from "@/Components/UserBalance.jsx";
 import { Link } from "@inertiajs/react";
 import { UserContext } from "@/Layouts/AuthenticatedLayout.jsx";
+import axios from "axios";
 
 export default function YourBet() {
     const user = useContext(UserContext);
@@ -19,8 +20,9 @@ export default function YourBet() {
     };
 
     const setMaxBet = () => {
-        let balance = user.balance;
-        setBetAmount(balance); // Zet de volledige gebruikersbalans in het invoerveld
+        axios.get(route("api.getBalance")).then((response) => {
+            setBetAmount(response.data.balance || 0); // Zet de volledige gebruikersbalans in het invoerveld
+        });
     };
 
     return (
@@ -55,37 +57,37 @@ export default function YourBet() {
 
             <div className="grid w-full grid-cols-3 gap-2 px-4 lg:px-0 lg:justify-center lg:items-center lg:flex lg:flex-wrap">
                 <button
-                    className="px-6 active:scale-90 transition duration-110 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
+                    className="px-6 py-2 transition rounded-md active:scale-90 duration-110 bg-scamgreen-50 text-scamgreen-40"
                     onClick={() => addToBet(10)}
                 >
                     +$10
                 </button>
                 <button
-                    className="px-6 active:scale-90 transition duration-110 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
+                    className="px-6 py-2 transition rounded-md active:scale-90 duration-110 bg-scamgreen-50 text-scamgreen-40"
                     onClick={() => addToBet(50)}
                 >
                     +$50
                 </button>
                 <button
-                    className="px-6 active:scale-90 transition duration-110 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
+                    className="px-6 py-2 transition rounded-md active:scale-90 duration-110 bg-scamgreen-50 text-scamgreen-40"
                     onClick={() => addToBet(100)}
                 >
                     +$100
                 </button>
                 <button
-                    className="px-6 active:scale-90 transition duration-110 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
+                    className="px-6 py-2 transition rounded-md active:scale-90 duration-110 bg-scamgreen-50 text-scamgreen-40"
                     onClick={() => setBetAmount((betAmount / 2).toFixed(2))}
                 >
                     1/2
                 </button>
                 <button
-                    className="px-6 active:scale-90 transition duration-110 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
+                    className="px-6 py-2 transition rounded-md active:scale-90 duration-110 bg-scamgreen-50 text-scamgreen-40"
                     onClick={() => setBetAmount((betAmount * 2).toFixed(2))}
                 >
                     x2
                 </button>
                 <button
-                    className="px-6 active:scale-90 transition duration-110 py-2 rounded-md bg-scamgreen-50 text-scamgreen-40"
+                    className="px-6 py-2 transition rounded-md active:scale-90 duration-110 bg-scamgreen-50 text-scamgreen-40"
                     onClick={setMaxBet}
                 >
                     Max

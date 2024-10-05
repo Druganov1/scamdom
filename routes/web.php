@@ -6,8 +6,10 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Events\testEvent;
 use App\Http\Controllers\BalanceController;
+use App\Http\Controllers\LiveChatController;
 use App\Console\Commands\RouletteTimer;
 use App\Http\Controllers\Games\MinesweeperController;
+
 
 Route::get('/test-broadcast', function () {
     testEvent::dispatch();
@@ -63,6 +65,8 @@ Route::prefix('api') // Prefix for all routes
         Route::post('/minesweeper/start', [MinesweeperController::class, 'StartGame'])->name('api.mineweeper-start');
         Route::post('/minesweeper/clicktile', [MinesweeperController::class, 'ClickedTile'])->name('api.click-tile');
         Route::get('/wallet/balance', [BalanceController::class, 'getUserBalance'])->name('api.getBalance');
+        Route::post('/chat/send', [LiveChatController::class, 'newChat'])->name('api.sendChatMessage');
+        Route::get('/chat/init', [LiveChatController::class, 'init'])->name('api.getMessages');
 
     });
 
