@@ -2,13 +2,18 @@ import React from "react";
 import { FaUsers } from "react-icons/fa";
 
 
-export function BettingContainers() {
+export function BettingContainers({betAmount}) {
+
+
     return (
         <div className="flex flex-col justify-center items-center space-y-2">
+            {/*<div className="text-5xl font-bold">*/}
+            {/*    {betAmount}*/}
+            {/*</div>*/}
             <div className="flex flex-col lg:flex-row lg:space-x-5 w-full items-center space-y-5 lg:space-y-0">
                 <div className="flex flex-col items-center justify-center w-full lg:w-1/3 bg-scamdom-40 rounded-xl p-2">
                     <div className="text-gray-400 py-2">
-                        Potential Profit: <span className="font-bold">$0.00</span>
+                        Potential Profit: <span className="font-bold"> ${!isNaN(parseFloat(betAmount)) ? new Intl.NumberFormat('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(parseFloat(betAmount).toFixed(2))  : "0.00"} </span>
                     </div>
                     <button className="w-11/12 text-white bg-roulette-red rounded-xl py-3 text-lg">
                         1 to 7
@@ -23,7 +28,7 @@ export function BettingContainers() {
 
                 <div className="flex flex-col items-center justify-center w-full lg:w-1/3 bg-scamdom-40 rounded-xl p-2">
                     <div className="text-gray-400 py-2">
-                        Potential Profit: <span className="font-bold">$0.00</span>
+                        Potential Profit: <span className="font-bold">${!isNaN(parseFloat(betAmount)) ? new Intl.NumberFormat('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((parseFloat(betAmount)* 13).toFixed(2))  : "0.00"}</span>
                     </div>
                     <button className="w-11/12 text-white bg-roulette-green rounded-xl py-3 text-lg">
                         0
@@ -38,7 +43,7 @@ export function BettingContainers() {
 
                 <div className="flex flex-col items-center justify-center w-full lg:w-1/3 bg-scamdom-40 rounded-xl p-2">
                     <div className="text-gray-400 py-2">
-                        Potential Profit: <span className="font-bold">$0.00</span>
+                        Potential Profit: <span className="font-bold">${!isNaN(parseFloat(betAmount)) ? new Intl.NumberFormat('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(parseFloat(betAmount).toFixed(2))  : "0.00"}</span>
                     </div>
                     <button className="w-11/12 text-white bg-gray-500 rounded-xl py-3 text-lg">
                         8 to 14

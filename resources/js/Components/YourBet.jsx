@@ -4,10 +4,8 @@ import { Link } from "@inertiajs/react";
 import { UserContext } from "@/Layouts/AuthenticatedLayout.jsx";
 import axios from "axios";
 
-export default function YourBet() {
+export default function YourBet({setBetAmount, betAmount}) {
     const user = useContext(UserContext);
-
-    const [betAmount, setBetAmount] = useState("");
 
     const addToBet = (amount) => {
         setBetAmount((prevAmount) =>
