@@ -7,16 +7,16 @@ import axios from "axios";
 export default function YourBet() {
     const user = useContext(UserContext);
 
-    const [betAmount, setBetAmount] = useState("0.00");
+    const [betAmount, setBetAmount] = useState("");
 
     const addToBet = (amount) => {
         setBetAmount((prevAmount) =>
-            (parseFloat(prevAmount) + amount).toFixed(2)
+            (parseFloat(prevAmount || 0) + amount).toFixed(2)
         );
     };
 
     const clearBet = () => {
-        setBetAmount("0.00");
+        setBetAmount("");
     };
 
     const setMaxBet = () => {
@@ -38,10 +38,8 @@ export default function YourBet() {
                         value={betAmount} // Bind state aan de invoerwaarde
                         onChange={(e) => {
                             let value = e.target.value;
-                            if (!isNaN(value) && value.trim() !== "") {
-                                setBetAmount(parseFloat(value).toFixed(2)); // Update en rond af naar 2 decimalen
-                            } else {
-                                setBetAmount("0.00"); // Terug naar "0.00" als de invoer niet geldig is
+                            if (!isNaN(value)) {
+                                setBetAmount(value); // Sta lege of numerieke invoer toe
                             }
                         }}
                         className="w-full px-4 py-2 text-white transition duration-500 border-transparent bg-scamdom-30 focus:ring-transparent focus:border-scamgreen-30 rounded-xl hover:border-scamgreen-30"

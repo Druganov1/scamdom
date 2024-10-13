@@ -1,4 +1,6 @@
 import React from "react";
+import { FaUsers } from "react-icons/fa";
+
 
 export function BettingContainers() {
     return (
@@ -13,7 +15,7 @@ export function BettingContainers() {
                     </button>
                     <div className="flex justify-between w-full mt-2 text-gray-400 px-4">
                 <span className="flex items-center">
-                    <i className="fa fa-users"></i> 0
+                    <FaUsers /> 0
                 </span>
                         <span>$0.00</span>
                     </div>
@@ -28,7 +30,7 @@ export function BettingContainers() {
                     </button>
                     <div className="flex justify-between w-full mt-2 text-gray-400 px-4">
                 <span className="flex items-center">
-                    <i className="fa fa-users"></i> 0
+                    <FaUsers /> 0
                 </span>
                         <span>$0.00</span>
                     </div>
@@ -43,7 +45,7 @@ export function BettingContainers() {
                     </button>
                     <div className="flex justify-between w-full mt-2 text-gray-400 px-4">
                 <span className="flex items-center">
-                    <i className="fa fa-users"></i> 0
+                    <FaUsers /> 0
                 </span>
                         <span>$0.00</span>
                     </div>
