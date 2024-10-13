@@ -17,6 +17,7 @@ export default function MinesGame() {
     const [winAmount, setWinAmount] = useState(0);
     const [winMultiplier, setWinMultiplier] = useState(0);
     const [cashedOut, setCashedOut] = useState(false);
+    const [gameHash, setGameHash] = useState("");
 
     function startGame(e) {
         e.preventDefault();
@@ -25,6 +26,7 @@ export default function MinesGame() {
 
         axios.post(route("api.mineweeper-start"), data).then((response) => {
             let input = response.data.input;
+            setCashedOut(false);
             setBustedTile(0); // Reset busted tile
             setTiles(Array(25).fill(null)); // Reset all tiles
             setGameStatus("running");
@@ -32,14 +34,29 @@ export default function MinesGame() {
             setMines(response.data.mines);
             setGems(response.data.gems);
             setWinMultiplier(0);
+            setWinAmount(0);
+            setGameHash(response.data.hash);
         });
     }
 
     const cashOut = async (e) => {
-        setCashedOut(true);
+        const data = {
+            hash: gameHash,
+        };
+        axios.post(route("api.minesweeper-cashout"), data).then((response) => {
+            const allTilePositions = response.data.all_tiles; // Get all tiles from the response
+            setCashedOut(true);
+            const updatedTiles = Array(25).fill(null); // Assuming there are 25 tiles total
+            allTilePositions.forEach(({ type, tile_number }) => {
+                updatedTiles[tile_number - 1] = type; // Map to the correct index (zero-based)
+            });
+            setTiles(updatedTiles); // Update state with all tiles revealed
+            setGameStatus("pending");
+        });
     };
 
     const clickTile = async (tileNumber) => {
+        if (gameStatus !== "running") return;
         try {
             const response = await axios.post(route("api.click-tile"), {
                 tilenum: tileNumber,
@@ -89,29 +106,29 @@ export default function MinesGame() {
     };
 
     return (
-        <div className="bg-slate-800 rounded-lg flex-col-reverse md:flex-row flex w-11/12 lg:w-9/12 mx-auto">
+        <div className="flex flex-col-reverse w-11/12 mx-auto rounded-lg bg-slate-800 md:flex-row lg:w-9/12">
             {gameStatus === "running" && (
                 <form
                     onSubmit={startGame}
-                    className="flex flex-col text-white text-sm rounded-b-lg lg:rounded-l-lg lg:rounded-br-none max-w-xs bg-slate-700 p-3"
+                    className="flex flex-col p-3 text-sm text-white rounded-b-lg md:max-w-xs lg:rounded-l-lg lg:rounded-br-none bg-slate-700"
                 >
                     <label htmlFor="bet_input" className="mb-1">
                         Bet amount
                     </label>
 
                     <input
-                        className="bg-slate-900 rounded-sm mb-3"
+                        className="mb-3 rounded-sm bg-slate-900"
                         name="bet_input"
                         value={betAmount}
                         disabled
                     />
                     <div className="flex space-x-4">
                         <div className="flex-1">
-                            <label htmlFor="gems" className="mb-1 block">
+                            <label htmlFor="gems" className="block mb-1">
                                 Gems
                             </label>
                             <input
-                                className="bg-slate-900 rounded-sm mb-3 block w-full"
+                                className="block w-full mb-3 rounded-sm bg-slate-900"
                                 disabled
                                 value={gems}
                                 name="gems"
@@ -119,11 +136,11 @@ export default function MinesGame() {
                             />
                         </div>
                         <div className="flex-1">
-                            <label htmlFor="mines_input" className="mb-1 block">
+                            <label htmlFor="mines_input" className="block mb-1">
                                 Mines
                             </label>
                             <input
-                                className="bg-slate-900 rounded-sm mb-3 block w-full"
+                                className="block w-full mb-3 rounded-sm bg-slate-900"
                                 disabled
                                 value={mines}
                                 name="mines_input"
@@ -136,14 +153,14 @@ export default function MinesGame() {
                     </label>
 
                     <input
-                        className="bg-slate-900 rounded-sm mb-3"
+                        className="mb-3 rounded-sm bg-slate-900"
                         name="win_amount"
                         value={winAmount}
                         disabled
                     />
                     <button
                         onClick={cashOut}
-                        className="bg-scamdom-primary text-black w-full rounded-sm p-4"
+                        className="w-full p-4 text-black rounded-sm bg-scamdom-primary"
                     >
                         Cash out
                     </button>
@@ -152,14 +169,14 @@ export default function MinesGame() {
             {gameStatus === "pending" && (
                 <form
                     onSubmit={startGame}
-                    className="flex flex-col text-white text-sm rounded-b-lg lg:rounded-l-lg lg:rounded-br-none  bg-slate-700 p-3"
+                    className="flex flex-col p-3 text-sm text-white rounded-b-lg lg:rounded-l-lg lg:rounded-br-none bg-slate-700"
                 >
                     <label htmlFor="bet_input" className="mb-1">
                         Bet amount
                     </label>
 
                     <input
-                        className="bg-slate-900 rounded-sm mb-3"
+                        className="mb-3 rounded-sm bg-slate-900"
                         type="number"
                         name="bet_input"
                         id=""
@@ -170,7 +187,7 @@ export default function MinesGame() {
                     </label>
 
                     <select
-                        className="bg-slate-900 rounded-sm mb-3"
+                        className="mb-3 rounded-sm bg-slate-900"
                         name="mines_input"
                         type="number"
                         id=""
@@ -184,18 +201,18 @@ export default function MinesGame() {
 
                     <button
                         type="submit"
-                        className="bg-scamdom-primary text-black w-full rounded-sm p-4"
+                        className="w-full p-4 text-black rounded-sm bg-scamdom-primary"
                     >
                         Bet
                     </button>
                 </form>
             )}
 
-            <div className="mx-auto my-auto relative">
+            <div className="relative mx-auto my-auto">
                 {cashedOut && (
-                    <div className="bg-slate-700 py-2 px-10 rounded-lg z-10 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-2 border-scamdom-primary text-scamdom-primary flex flex-col  items-center gap-1">
+                    <div className="absolute z-10 flex flex-col items-center gap-1 px-10 py-2 transform -translate-x-1/2 -translate-y-1/2 border-2 rounded-lg bg-slate-700 top-1/2 left-1/2 border-scamdom-primary text-scamdom-primary">
                         <h3 className="text-2xl">{winMultiplier}×</h3>
-                        <div className="border border-slate-500 w-5 rounded-lg"></div>
+                        <div className="w-5 border rounded-lg border-slate-500"></div>
                         <p className="text-xs">${winAmount}</p>
                     </div>
                 )}
@@ -218,13 +235,14 @@ export default function MinesGame() {
                                 index + 1 !== bustedTileIndex // Grey out if NOT the busted tile
                                     ? "opacity-50"
                                     : "opacity-100" // Show fully opaque if it is the busted tile or not yet clicked
-                            }`}
+                            }
+                            `}
                         >
                             {tiles[index] ? (
                                 <img
                                     src={getTileImage(tiles[index])}
                                     alt={`Tile ${index + 1}`}
-                                    className="size-10 mx-auto mb-2 sm:size-12 md:size-14 lg:size-16"
+                                    className="mx-auto mb-2 size-10 sm:size-12 md:size-14 lg:size-16"
                                 />
                             ) : (
                                 <span className="absolute inset-0 rounded-lg shadow-[inset_0_-5px_0_0_rgba(0,0,0,0.4)]"></span>

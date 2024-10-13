@@ -13,11 +13,10 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { signal } from "@preact/signals-react";
 
 export const UserContext = createContext();
-const isOpen = signal(localStorage.getItem("chatOpen") || false);
+const isOpen = signal(localStorage.getItem("chatOpen") === "true");
 
 const toggleChat = () => {
     isOpen.value = !isOpen.value;
-    console.log(isOpen.value); // This logs correctly, but the component needs to listen to changes
     localStorage.setItem("chatOpen", isOpen.value);
 };
 

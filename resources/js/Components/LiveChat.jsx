@@ -64,7 +64,8 @@ export default function LiveChat({ isOpen, toggleChat }) {
             <div
                 className={`fixed top-0 right-0 h-screen w-screen md:w-80 bg-white shadow-lg z-50 transition-transform duration-300 ease-in-out  ${
                     isOpen.value ? "translate-x-0" : "translate-x-full"
-                }`}
+                }
+                `}
             >
                 <div className="flex flex-col h-full">
                     <div className="flex items-center justify-between px-4 text-white border-b-2 py-7 bg-scamdom-chat border-scamdom-30">

@@ -20,10 +20,10 @@ export default function WalletComp({ user }) {
         //     </Link>
         // </div>
 
-        <div className="flex items-center justify-around w-48 rounded-md h-14 bg-scamdom-40">
+        <div className="flex items-center justify-around w-full rounded-md h-14 bg-scamdom-40">
             <div className="flex">
                 <span className="mr-2 text-lg text-green-400">$</span>
-                <span className="text-lg font-semibold">
+                <span className="mr-2 text-lg font-semibold">
                     <UserBalance user={user}></UserBalance>
                 </span>
             </div>

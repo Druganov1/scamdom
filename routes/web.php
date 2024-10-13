@@ -9,6 +9,7 @@ use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\LiveChatController;
 use App\Console\Commands\RouletteTimer;
 use App\Http\Controllers\Games\MinesweeperController;
+use App\Http\Controllers\BetsController;
 
 
 Route::get('/test-broadcast', function () {
@@ -54,6 +55,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/bets', [BetsController::class, 'show'])->name('profile.bets');
+
 });
 
 
@@ -64,6 +68,8 @@ Route::prefix('api') // Prefix for all routes
         Route::post('/roulette/init', [RouletteTimer::class, 'init'])->name('api.roulette-init');
         Route::post('/minesweeper/start', [MinesweeperController::class, 'StartGame'])->name('api.mineweeper-start');
         Route::post('/minesweeper/clicktile', [MinesweeperController::class, 'ClickedTile'])->name('api.click-tile');
+        Route::post('/minesweeper/cashout', [MinesweeperController::class, 'cashOut'])->name('api.minesweeper-cashout');
+
         Route::get('/wallet/balance', [BalanceController::class, 'getUserBalance'])->name('api.getBalance');
         Route::post('/chat/send', [LiveChatController::class, 'newChat'])->name('api.sendChatMessage');
         Route::get('/chat/init', [LiveChatController::class, 'init'])->name('api.getMessages');

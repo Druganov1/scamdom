@@ -20,10 +20,11 @@ export default function Header({ user }) {
 
     return (
         <header className="py-3 border-b-2 bg-scamdom-50 border-scamdom-30">
-            <div className="container mx-auto">
-                <div className="relative flex items-center justify-between w-full text-white">
+            <div className="container relative mx-auto">
+                <div className="flex items-center justify-between w-full text-white">
                     <h2 className="text-lg font-bold">Scamdom</h2>
 
+                    {/* Centered Menu */}
                     <nav className="absolute flex space-x-6 transform -translate-x-1/2 left-1/2">
                         {menuItems.map((item) => {
                             let href;
@@ -66,7 +67,37 @@ export default function Header({ user }) {
                         })}
                     </nav>
 
-                    <WalletComp user={user} />
+                    {/* Right side: Wallet and User Menu */}
+                    <div className="flex items-center space-x-4">
+                        <WalletComp user={user} />
+                        <Dropdown>
+                            <Dropdown.Trigger>
+                                <span className="w-10 h-10 overflow-hidden rounded-full">
+                                    <img
+                                        src={`https://avatar.iran.liara.run/username?username=${user.name}`}
+                                        alt="user profile"
+                                        className="object-contain size-12"
+                                    />
+                                </span>
+                            </Dropdown.Trigger>
+
+                            <Dropdown.Content>
+                                <Dropdown.Link href={route("profile.edit")}>
+                                    Profile
+                                </Dropdown.Link>
+                                <Dropdown.Link
+                                    href={route("logout")}
+                                    method="post"
+                                    as="button"
+                                >
+                                    Log Out
+                                </Dropdown.Link>
+                                <Dropdown.Link href={route("profile.bets")}>
+                                    Bets
+                                </Dropdown.Link>
+                            </Dropdown.Content>
+                        </Dropdown>
+                    </div>
                 </div>
             </div>
         </header>

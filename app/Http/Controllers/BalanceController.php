@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 class BalanceController extends Controller
 {
 
-    public $MAX_DAILY_DEPOSIT_TOTAL = 10000;
+    public $MAX_DAILY_DEPOSIT_TOTAL = 300;
 
     private function CheckDailyDeposit($user){
 
@@ -29,8 +29,8 @@ class BalanceController extends Controller
         $user = $request->user();
         $amount = $request->amount;
 
-        if($this->CheckDailyDeposit($user) >= $this->MAX_DAILY_DEPOSIT_TOTAL){
-        return response()->json(['message' => 'Je hebt het maximale daglimiet van $10.000 voor stortingen bereikt.'], 403);
+        if($this->CheckDailyDeposit($user) == $this->MAX_DAILY_DEPOSIT_TOTAL){
+        return response()->json(['message' => "Je hebt het maximale daglimiet van \${$this->MAX_DAILY_DEPOSIT_TOTAL} voor stortingen bereikt."], 403);
         }
 
         $user->balance += $amount;
@@ -41,7 +41,7 @@ class BalanceController extends Controller
             'amount' => $amount,
 
         ]);
-        WalletBalanceUpdated::dispatch($user->balance, $user);
+        $this->updateBalance($user->balance, $user);
 
 
 
@@ -49,6 +49,14 @@ class BalanceController extends Controller
         return response()->json(['message' => 'Saldo opgewaardeerd!'], 200);
     }
 
+
+    public static function updateBalance($amount, User $user){
+        WalletBalanceUpdated::dispatch($amount, $user);
+        $user->balance = $amount;
+        $user->save();
+
+
+    }
     public function getUserBalance(){
 
         $user = Auth::user();

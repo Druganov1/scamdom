@@ -7,10 +7,16 @@ use Cache;
 use Illuminate\Http\Request;
 use App\Models\Minesweeper_games;
 use Number;
+use App\Models\Bets;
+use App\Http\Controllers\BalanceController;
+
+
 
 class MinesweeperController extends Controller
 {
 
+
+    public $details;
     public function createGrid($minesInput) {
         $GRID_SIZE = 25;
         $numMines = $minesInput;
@@ -51,7 +57,18 @@ class MinesweeperController extends Controller
 
 
     public function StartGame(Request $request){
+        $gamehash = Cache::get('minesweeper_game_' . auth()->id());
+        $game = Minesweeper_games::where('hash', $gamehash)->first();
+        if ($game) {
+            $game->status = 'abandoned';
+            $game->game_ended_at = $game->last_activity_at;
+            $game->win_amount = 0;
+            $game->payout_multiplier = 0;
+            $game->save();
+        }
 
+
+        $initial_balance = auth()->user()->balance;
         // first we need to validate the request
         $request->validate([
             'bet_input' => 'required|numeric|min:0.01',
@@ -62,6 +79,8 @@ class MinesweeperController extends Controller
         // then we create the mine_positions array
         $mine_positions = $this->createGrid($request->input('mines_input'));
 
+        $newBalance = auth()->user()->balance +- $request->input('bet_input');
+        BalanceController::updateBalance($newBalance, auth()->user());
 
         $game = Minesweeper_games::create([
             'hash' => md5(uniqid()),
@@ -72,17 +91,38 @@ class MinesweeperController extends Controller
             'revealed_positions' => [],
             'status' => 'ingame',
             'last_activity_at' => now(),
-            'initial_balance' => auth()->user()->balance,
+            'initial_balance' => $initial_balance
         ]);
 
         Cache::put('minesweeper_game_' . auth()->id(), $game->hash, now()->addMinutes(30));
 
+        $this->details = json_encode([
+            'hash' => $game->hash,
+            'input' => $request->input('bet_input'),
+            'mines' => $request->input('mines_input'),
+            'gems' => (25 - $request->input('mines_input')),
+            'mine_positions' => $mine_positions,
+            'initial_balance' => $initial_balance
+        ]);
+
+        Bets::create([
+            'user_id' => auth()->id(),
+            'bet_amount' => $request->input('bet_input'),
+            'bet_time' => now(),
+            'game_type' => 'mines',
+            'details' => $this->details,
+            'status' => 'pending',
+            'game_id' => $game->hash,
+            'initial_balance' => $initial_balance
+        ]);
         return response()->json([
             'hash' => $game->hash,
             'input' => $request->input('bet_input'),
             'mines' => $request->input('mines_input'),
             'gems' => (25 - $request->input('mines_input')),
         ]);
+
+
     }
 
     public function factorial($n) {
@@ -118,6 +158,49 @@ public function getWinMultiplier($mines, $tilesClicked) {
 }
 
 
+
+    public function cashOut(Request $request) {
+        $gamehash = Cache::get('minesweeper_game_' . auth()->id());
+        $game = Minesweeper_games::where('hash', $gamehash)->first();
+
+        if (!$game) {
+            return response()->json([
+                'message' => 'Game not found'
+            ], 404);
+        }
+
+        if ($game->status === 'finished') {
+            return response()->json([
+                'message' => 'Game is finished'
+            ], 400);
+        }
+        $winMultiplier = $this->getWinMultiplier($game->mines, count($game->revealed_positions));
+
+        $multiplier = $game->bet_amount * $winMultiplier;
+        $totalProfit = round($multiplier-$game->bet_amount, 2);
+
+        $bet = Bets::where('game_id', $game->hash)->first();
+        $bet->status = 'completed';
+        $bet->win_amount = $totalProfit;
+        $bet->win_multiplier = $winMultiplier;
+        $bet->save();
+
+        $game->win_amount = $totalProfit;
+        $game->payout_multiplier = $winMultiplier;
+        $game->status = 'finished';
+        $game->game_ended_at = now();
+        $game->save();
+
+        $newBalance = auth()->user()->balance += ($totalProfit + $game->bet_amount);
+
+
+        BalanceController::updateBalance($newBalance, auth()->user());
+
+        return response()->json([
+            'all_tiles' => $game->mine_positions,
+
+        ]);
+    }
 
 
 
@@ -168,8 +251,16 @@ public function getWinMultiplier($mines, $tilesClicked) {
             $game->win_amount = 0;
             $game->payout_multiplier = 0;
             $game->last_activity_at = now();
+            $game->game_ended_at = now();
 
             $game->save();
+
+            // Update the bet status to 'completed', but set the win amount and multiplier to 0
+            $bet = Bets::where('game_id', $game->hash)->first();
+            $bet->status = 'completed';
+            $bet->win_amount = 0;
+            $bet->win_multiplier = 0;
+            $bet->save();
             return response()->json([
                 'tile_result' => $tileType,
                 'all_tiles' => $game->mine_positions,
