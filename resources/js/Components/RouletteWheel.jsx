@@ -5,6 +5,9 @@ import RouletteResult from "./RouletteResult";
 import PreviousRolls from "./PreviousRolls";
 
 const RouletteWheel = () => {
+    const spinAudio = new Audio("/assets/sounds/Roullete_Spin.mp3");
+    const resultAudio = new Audio("/assets/sounds/Roullete_Result.mp3");
+
     const [showStopwatch, setShowStopwatch] = useState(false);
     const [spinningNow, setSpinning] = useState(false);
     const [landed, setLanded] = useState(false);
@@ -67,12 +70,16 @@ const RouletteWheel = () => {
 
                     break;
                 case "spin":
+                    spinAudio.play();
+
                     setShowStopwatch(false);
                     spinWheel(data.number, 6000);
                     setSpinning(true);
                     setSlot(data.number);
                     break;
                 case "result":
+                    resultAudio.play();
+
                     setLanded(true);
                     setSpinning(false);
 
@@ -178,7 +185,7 @@ const RouletteWheel = () => {
                 {landed && <RouletteResult result={slot} />}
             </div>
 
-            <div className="roulette-wrapper relative flex justify-center w-full mx-auto overflow-hidden mask-gradient-spinner">
+            <div className="relative flex justify-center w-full mx-auto overflow-hidden roulette-wrapper mask-gradient-spinner">
                 <div className="w-[3px] bg-gray-500 h-full absolute left-1/2 z-10 -translate-x-1/2 "></div>
                 <div ref={wheelRef} className="flex "></div>
             </div>

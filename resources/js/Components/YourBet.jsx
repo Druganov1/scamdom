@@ -1,11 +1,11 @@
 import React, { useState, useContext } from "react";
-import UserBalance from "@/Components/UserBalance.jsx";
 import { Link } from "@inertiajs/react";
-import { UserContext } from "@/Layouts/AuthenticatedLayout.jsx";
+import { BalanceContext, UserContext } from "@/Layouts/AuthenticatedLayout.jsx";
 import axios from "axios";
 
 export default function YourBet({ setBetAmount, betAmount }) {
     const user = useContext(UserContext);
+    const balance = useContext(BalanceContext);
 
     const addToBet = (amount) => {
         setBetAmount((prevAmount) =>
@@ -18,9 +18,7 @@ export default function YourBet({ setBetAmount, betAmount }) {
     };
 
     const setMaxBet = () => {
-        axios.get(route("api.getBalance")).then((response) => {
-            setBetAmount(response.data.balance || 0); // Zet de volledige gebruikersbalans in het invoerveld
-        });
+        setBetAmount(balance); // Zet de volledige gebruikersbalans in het invoerveld
     };
 
     return (
@@ -43,7 +41,7 @@ export default function YourBet({ setBetAmount, betAmount }) {
                         className="w-full px-4 py-2 text-white transition duration-500 border-transparent bg-scamdom-30 focus:ring-transparent focus:border-scamgreen-30 rounded-xl hover:border-scamgreen-30"
                     />
                     <button
-                        className="active:scale-90 transition duration-110 absolute bg-scamdom-40 rounded-xl right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 text-white hover:text-scamgreen-30 transition duration-500"
+                        className="active:scale-90 duration-110 absolute bg-scamdom-40 rounded-xl right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 text-white hover:text-scamgreen-30 transition duration-500"
                         onClick={clearBet} // Clear bet amount
                     >
                         Clear
