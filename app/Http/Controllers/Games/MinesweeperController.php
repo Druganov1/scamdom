@@ -79,7 +79,7 @@ class MinesweeperController extends Controller
         // then we create the mine_positions array
         $mine_positions = $this->createGrid($request->input('mines_input'));
 
-        $newBalance = auth()->user()->balance +- $request->input('bet_input');
+        $newBalance = auth()->user()->balance - $request->input('bet_input');
         BalanceController::updateBalance($newBalance, auth()->user());
 
         $game = Minesweeper_games::create([

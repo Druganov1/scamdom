@@ -9,6 +9,8 @@ use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\LiveChatController;
 use App\Console\Commands\RouletteTimer;
 use App\Http\Controllers\Games\MinesweeperController;
+use App\Http\Controllers\Games\RouletteController;
+
 use App\Http\Controllers\BetsController;
 
 
@@ -66,6 +68,8 @@ Route::prefix('api') // Prefix for all routes
     ->group(function () {
         Route::post('/add-funds', [BalanceController::class, 'addFunds'])->name('api.addfunds');
         Route::post('/roulette/init', [RouletteTimer::class, 'init'])->name('api.roulette-init');
+        Route::post('/roulette/bet', [RouletteController::class, 'placeBet'])->name('api.roulette-bet');
+
         Route::post('/minesweeper/start', [MinesweeperController::class, 'StartGame'])->name('api.mineweeper-start');
         Route::post('/minesweeper/clicktile', [MinesweeperController::class, 'ClickedTile'])->name('api.click-tile');
         Route::post('/minesweeper/cashout', [MinesweeperController::class, 'cashOut'])->name('api.minesweeper-cashout');

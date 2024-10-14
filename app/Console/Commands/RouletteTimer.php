@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 use App\Events\RouletteService;
 use Illuminate\Support\Facades\Cache;
-
+use App\Http\Controllers\Games\RouletteController;
 
 class RouletteTimer extends Command
 {
@@ -29,7 +29,6 @@ class RouletteTimer extends Command
         parent::__construct();
     }
 
-
     public $startTime;
     public $gameResult;
     public $currentStage;
@@ -38,32 +37,28 @@ class RouletteTimer extends Command
 
     public function init()
     {
-
         $cachedStartTime = Cache::get('roulette_start_time');
         $cachedGameResult = Cache::get('roulette_game_result');
         $currentStage = Cache::get('current_game_stage');
         $last_rolls = RoulletteHistory::orderBy('created_at', 'desc')->take(10)->pluck('number');
         \Log::info($currentStage); // als deze hier niet is dan werkt het helemaal niet bruh
 
-
         if (!$cachedStartTime || !$cachedGameResult || !$currentStage) {
             return [
                 'gameResult' => null,
                 'remainingTime' => null,
                 'currentStage' => $currentStage,
-                'last_rolls' => $last_rolls
-
+                'last_rolls' => $last_rolls,
             ];
         }
 
         $currentTime = time();
         $elapsedTime = $currentTime - $cachedStartTime;
 
-
         $stageDurations = [
             'countdown' => 15,
             'spin' => 6,
-            'result' => 6
+            'result' => 6,
         ];
 
         // Determine the current stage and calculate remaining time
@@ -72,18 +67,15 @@ class RouletteTimer extends Command
 
         if ($currentStage === 'countdown') {
             $remainingTime = max(0, ($stageDurations['countdown'] - $elapsedTime) * 1000); // Convert to milliseconds
-            $timeAtSpin= null;
-
+            $timeAtSpin = null;
         } elseif ($currentStage === 'spin') {
             $stageStartTime -= $stageDurations['countdown'];
             $remainingTime = max(0, ($stageDurations['spin'] - ($elapsedTime - $stageStartTime)) * 1000); // Convert to milliseconds
-            $timeAtSpin= Cache::get('time_at_spin');
-
+            $timeAtSpin = Cache::get('time_at_spin');
         } elseif ($currentStage === 'result') {
-            $stageStartTime -= ($stageDurations['countdown'] + $stageDurations['spin']);
+            $stageStartTime -= $stageDurations['countdown'] + $stageDurations['spin'];
             $remainingTime = max(0, ($stageDurations['result'] - ($elapsedTime - $stageStartTime)) * 1000); // Convert to milliseconds
-            $timeAtSpin= null;
-
+            $timeAtSpin = null;
         }
 
         return [
@@ -91,63 +83,61 @@ class RouletteTimer extends Command
             'gameResult' => $cachedGameResult,
             'remainingTime' => $remainingTime,
             'currentStage' => $currentStage,
-            'last_rolls' => $last_rolls
+            'last_rolls' => $last_rolls,
         ];
     }
-
-
-
-
 
     /**
      * Execute the console command.
      */
 
-     private function weightedRandomRoulette()
-     {
-   // Define the roulette numbers with their weights
-   $rouletteNumbers = [
-    ['number' => 1, 'weight' => 1],
-    ['number' => 14, 'weight' => 1],
-    ['number' => 2, 'weight' => 1],
-    ['number' => 13, 'weight' => 1],
-    ['number' => 3, 'weight' => 1],
-    ['number' => 12, 'weight' => 1],
-    ['number' => 4, 'weight' => 1],
-    ['number' => 0, 'weight' => 0.3], // Very uncommon
-    ['number' => 11, 'weight' => 1],
-    ['number' => 5, 'weight' => 1],
-    ['number' => 10, 'weight' => 1],
-    ['number' => 6, 'weight' => 1],
-    ['number' => 9, 'weight' => 1],
-    ['number' => 7, 'weight' => 1],
-    ['number' => 8, 'weight' => 1],
-];
+    private function weightedRandomRoulette()
+    {
+        // Define the roulette numbers with their weights
+        $rouletteNumbers = [
+            ['number' => 1, 'weight' => 1],
+            ['number' => 14, 'weight' => 1],
+            ['number' => 2, 'weight' => 1],
+            ['number' => 13, 'weight' => 1],
+            ['number' => 3, 'weight' => 1],
+            ['number' => 12, 'weight' => 1],
+            ['number' => 4, 'weight' => 1],
+            ['number' => 0, 'weight' => 0.3], // Very uncommon
+            ['number' => 11, 'weight' => 1],
+            ['number' => 5, 'weight' => 1],
+            ['number' => 10, 'weight' => 1],
+            ['number' => 6, 'weight' => 1],
+            ['number' => 9, 'weight' => 1],
+            ['number' => 7, 'weight' => 1],
+            ['number' => 8, 'weight' => 1],
+        ];
 
-// Create an array with the weighted numbers
-$weightedNumbers = [];
-foreach ($rouletteNumbers as $item) {
-    for ($i = 0; $i < $item['weight'] * 10; $i++) {
-        $weightedNumbers[] = $item['number'];
+        // Create an array with the weighted numbers
+        $weightedNumbers = [];
+        foreach ($rouletteNumbers as $item) {
+            for ($i = 0; $i < $item['weight'] * 10; $i++) {
+                $weightedNumbers[] = $item['number'];
+            }
+        }
+
+        // Randomly select a number from the weighted array
+        $randomIndex = array_rand($weightedNumbers);
+        return $weightedNumbers[$randomIndex];
     }
-}
-
-// Randomly select a number from the weighted array
-$randomIndex = array_rand($weightedNumbers);
-return $weightedNumbers[$randomIndex];
-}
 
     public function handle()
     {
         while (true) {
             // first stage, countdown
+            $gamehash = md5($this->gameResult + time());
+            RouletteController::setGameHash($gamehash);
 
             $this->info('Starting 15 second countdown');
             $this->startTime = time();
             $this->currentStage = 'countdown';
             RouletteService::dispatch([
                 'countDown_msec' => $this->_COUNTDOWN_MSEC,
-                'currentStage' => $this->currentStage
+                'currentStage' => $this->currentStage,
             ]);
             // Store game result and start time in cache
             Cache::put('roulette_start_time', $this->startTime);
@@ -167,24 +157,23 @@ return $weightedNumbers[$randomIndex];
 
             RouletteService::dispatch([
                 'number' => $this->gameResult,
-                'currentStage' => $this->currentStage
+                'currentStage' => $this->currentStage,
             ]);
             sleep(6);
             // last stage, result
-            $gamehash = md5($this->gameResult + time());
 
             $color = match ($this->gameResult) {
                 0 => 'green',
                 1, 2, 3, 4, 5, 6, 7 => 'red',
                 8, 9, 10, 11, 12, 13, 14 => 'black',
-                default => null // fallback for invalid result
+                default => null, // fallback for invalid result
             };
 
-
+            RouletteController::announceResults($color);
             RoulletteHistory::create([
                 'number' => $this->gameResult,
                 'color' => $color,
-                'hash' => $gamehash
+                'hash' => $gamehash,
             ]);
             $this->currentStage = 'result';
             Cache::put('current_game_stage', $this->currentStage);
@@ -192,13 +181,9 @@ return $weightedNumbers[$randomIndex];
             RouletteService::dispatch([
                 'gameResult' => $this->gameResult,
                 'currentStage' => $this->currentStage,
-                'hash' => $gamehash
+                'hash' => $gamehash,
             ]);
             sleep(6);
-
-
-
-
         }
     }
 }
