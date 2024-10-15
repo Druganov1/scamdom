@@ -150,6 +150,12 @@ class RouletteTimer extends Command
             $this->info('Starting spin');
 
             $this->gameResult = $this->weightedRandomRoulette();
+            $color = match ($this->gameResult) {
+                0 => 'green',
+                1, 2, 3, 4, 5, 6, 7 => 'red',
+                8, 9, 10, 11, 12, 13, 14 => 'black',
+                default => null, // fallback for invalid result
+            };
             Cache::put('time_at_spin', time());
 
             Cache::put('roulette_game_result', $this->gameResult);
@@ -162,12 +168,7 @@ class RouletteTimer extends Command
             sleep(6);
             // last stage, result
 
-            $color = match ($this->gameResult) {
-                0 => 'green',
-                1, 2, 3, 4, 5, 6, 7 => 'red',
-                8, 9, 10, 11, 12, 13, 14 => 'black',
-                default => null, // fallback for invalid result
-            };
+
 
             RouletteController::announceResults($color);
             RoulletteHistory::create([
@@ -182,6 +183,8 @@ class RouletteTimer extends Command
                 'gameResult' => $this->gameResult,
                 'currentStage' => $this->currentStage,
                 'hash' => $gamehash,
+                'color' => $color,
+
             ]);
             sleep(6);
         }

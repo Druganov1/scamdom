@@ -69,6 +69,7 @@ Route::prefix('api') // Prefix for all routes
         Route::post('/add-funds', [BalanceController::class, 'addFunds'])->name('api.addfunds');
         Route::post('/roulette/init', [RouletteTimer::class, 'init'])->name('api.roulette-init');
         Route::post('/roulette/bet', [RouletteController::class, 'placeBet'])->name('api.roulette-bet');
+        Route::post('/roulette/getbets', [RouletteController::class, 'getBets'])->name('api.roulette-getbets');
 
         Route::post('/minesweeper/start', [MinesweeperController::class, 'StartGame'])->name('api.mineweeper-start');
         Route::post('/minesweeper/clicktile', [MinesweeperController::class, 'ClickedTile'])->name('api.click-tile');

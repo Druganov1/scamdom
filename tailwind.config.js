@@ -31,6 +31,7 @@ export default {
                     red: "rgb(236, 75, 63)",
                     green: "rgb(48, 193, 73)",
                     black: "rgb(53, 57, 66)",
+                    text_black: "#6e7689",
                 },
                 scamgreen: {
                     30: "rgb(0, 255, 134)",

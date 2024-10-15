@@ -6,9 +6,8 @@ import { BalanceContext } from "@/Layouts/AuthenticatedLayout.jsx";
 export function BettingContainers({ betAmount }) {
     const balance = useContext(BalanceContext);
 
-    const [liveBets, setLiveBets] = useState([
-
-    ]);
+    const [liveBets, setLiveBets] = useState([]);
+    const [currentColor, setCurrentColor] = useState("");
 
     const [betCounts, setBetCounts] = useState({
         red: 0,
@@ -36,6 +35,7 @@ export function BettingContainers({ betAmount }) {
     const [locked, setLocked] = useState(false);
 
     const resetBets = () => {
+        setCurrentColor("");
         setBetCounts({ red: 0, black: 0, green: 0 });
         setBetAmounts({ red: 0, black: 0, green: 0 });
         setUniqueUsers({ red: new Set(), black: new Set(), green: new Set() });
@@ -44,6 +44,66 @@ export function BettingContainers({ betAmount }) {
     };
 
     useEffect(() => {
+        axios
+            .post(route("api.roulette-getbets"))
+            .then((response) => {
+                const data = response.data;
+                data.bets.forEach((betObj) => {
+                    const betPosition = betObj.bet_position; // e.g., 'red', 'black', or 'green'
+                    const username = betObj.user; // Use 'user' to get the username
+                    const newBet = {
+                        name: betObj.user, // User's name
+                        bet_position: betObj.bet_position, // e.g., 'red', 'black', or 'green'
+                        bet_amount: parseFloat(betObj.bet_amount), // Bet amount as a float
+                    };
+
+                    // Update the liveBets state with the new bet
+                    setLiveBets((prevBets) => {
+                        // Zoek naar een bestaande bet voor deze gebruiker
+                        const existingBetIndex = prevBets.findIndex(
+                            (bet) =>
+                                bet.name === newBet.name &&
+                                bet.bet_position === newBet.bet_position
+                        );
+
+                        // Als er al een bet is, werk die dan bij
+                        if (existingBetIndex !== -1) {
+                            const updatedBets = [...prevBets];
+                            updatedBets[existingBetIndex].bet_amount +=
+                                newBet.bet_amount; // Voeg de nieuwe bet_amount toe
+                            return updatedBets;
+                        } else {
+                            // Anders voeg je een nieuwe bet toe
+                            return [...prevBets, newBet];
+                        }
+                    });
+
+                    setUniqueUsers((prevUsers) => {
+                        const newUsers = { ...prevUsers };
+                        // Check if the username is already in the set for this position
+                        if (!newUsers[betPosition].has(username)) {
+                            newUsers[betPosition].add(username);
+                            // If it's a new user, increment the bet count
+                            setBetCounts((prevCounts) => ({
+                                ...prevCounts,
+                                [betPosition]: prevCounts[betPosition] + 1,
+                            }));
+                        }
+                        return newUsers; // Return the updated unique users
+                    });
+
+                    // Update bet amounts
+                    setBetAmounts((prevAmounts) => {
+                        const newAmounts = { ...prevAmounts };
+                        newAmounts[betPosition] += parseFloat(
+                            betObj.bet_amount
+                        ); // Add the bet amount
+                        return newAmounts; // Return the updated amounts
+                    });
+                });
+            })
+            .catch((error) => console.error("Error fetching bet data:", error));
+
         const channel = Echo.channel("roulette");
 
         channel.listen("RouletteService", (e) => {
@@ -56,6 +116,8 @@ export function BettingContainers({ betAmount }) {
                 case "spin":
                     setLocked(true);
                     break;
+                case "result":
+                    setCurrentColor(data.color);
                 default:
                     break;
             }
@@ -69,8 +131,8 @@ export function BettingContainers({ betAmount }) {
             const username = data.user; // Use 'user' to get the username
 
             const newBet = {
-                name: data.user,          // User's name
-                bet_position: data.bet_position,  // e.g., 'red', 'black', or 'green'
+                name: data.user, // User's name
+                bet_position: data.bet_position, // e.g., 'red', 'black', or 'green'
                 bet_amount: parseFloat(data.bet_amount), // Bet amount as a float
             };
 
@@ -78,13 +140,16 @@ export function BettingContainers({ betAmount }) {
             setLiveBets((prevBets) => {
                 // Zoek naar een bestaande bet voor deze gebruiker
                 const existingBetIndex = prevBets.findIndex(
-                    (bet) => bet.name === newBet.name && bet.bet_position === newBet.bet_position
+                    (bet) =>
+                        bet.name === newBet.name &&
+                        bet.bet_position === newBet.bet_position
                 );
 
                 // Als er al een bet is, werk die dan bij
                 if (existingBetIndex !== -1) {
                     const updatedBets = [...prevBets];
-                    updatedBets[existingBetIndex].bet_amount += newBet.bet_amount; // Voeg de nieuwe bet_amount toe
+                    updatedBets[existingBetIndex].bet_amount +=
+                        newBet.bet_amount; // Voeg de nieuwe bet_amount toe
                     return updatedBets;
                 } else {
                     // Anders voeg je een nieuwe bet toe
@@ -120,6 +185,10 @@ export function BettingContainers({ betAmount }) {
             channel.stopListening("RouletteService");
         };
     }, []); // Dependencies stay empty to avoid re-subscribing on every render
+
+    useEffect(() => {
+        console.log("livebets updated:", liveBets);
+    }, [liveBets]); // Added displayedAmounts to dependency array
 
     useEffect(() => {
         const incrementAmount = (position, targetAmount) => {
@@ -219,7 +288,7 @@ export function BettingContainers({ betAmount }) {
                     </button>
                     <div className="flex justify-between w-full px-4 mt-2 text-gray-400">
                         <span className="flex items-center">
-                            <FaUsers className="mr-2"/> {betCounts.red}
+                            <FaUsers className="mr-2" /> {betCounts.red}
                         </span>
                         <span>${displayedAmounts.red.toFixed(2)}</span>
                     </div>
@@ -230,25 +299,37 @@ export function BettingContainers({ betAmount }) {
                             <>
                                 {/* Vind de hoogste bet */}
                                 {liveBets
+                                    .filter((bet) => bet.bet_position === "red")
                                     .sort((a, b) => b.bet_amount - a.bet_amount) // Sorteer de bets van hoog naar laag
                                     .slice(0, 1) // Neem alleen de hoogste bet (de eerste)
                                     .map((topBet, index) => (
                                         <div key={index}>
-                                            <div
-                                                className="flex justify-between items-center w-full space-x-2 bg-scamdom-30 p-2">
+                                            <div className="flex items-center justify-between w-full p-2 space-x-2 bg-scamdom-30">
                                                 <div className="flex gap-1.5">
                                                     <img
                                                         src={`https://avatar.iran.liara.run/username?username=${topBet.name}`}
                                                         alt="user profile"
                                                         className="object-contain size-12"
                                                     />
-                                                    <div className="text-sm flex justify-center flex-col ">
-                                                        <p className="text-roulette-red">Top {topBet.bet_position}</p>
-                                                        <p className="text-white">{topBet.name}</p>
+                                                    <div className="flex flex-col justify-center text-sm ">
+                                                        <p className="text-roulette-red">
+                                                            Top{" "}
+                                                            {
+                                                                topBet.bet_position
+                                                            }
+                                                        </p>
+                                                        <p className="text-white">
+                                                            {topBet.name}
+                                                        </p>
                                                     </div>
                                                 </div>
                                                 <div className="text-white">
-                                                    <p>${topBet.bet_amount.toFixed(2)}</p>
+                                                    <p>
+                                                        $
+                                                        {topBet.bet_amount.toFixed(
+                                                            2
+                                                        )}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -260,23 +341,31 @@ export function BettingContainers({ betAmount }) {
                         {liveBets.length > 1 && (
                             <>
                                 {liveBets
+                                    .filter((bet) => bet.bet_position === "red")
                                     .sort((a, b) => b.bet_amount - a.bet_amount) // Sorteer opnieuw om de volgorde te behouden
                                     .slice(1) // Neem de overige bets na de hoogste bet
                                     .map((subBet, index) => (
                                         <div key={index}>
-                                            <div className="flex justify-between items-center w-full space-x-2 px-2">
+                                            <div className="flex items-center justify-between w-full px-2 space-x-2">
                                                 <div className="flex gap-1.5">
                                                     <img
                                                         src={`https://avatar.iran.liara.run/username?username=${subBet.name}`}
                                                         alt="user profile"
                                                         className="object-contain size-8"
                                                     />
-                                                    <div className="text-sm flex justify-center flex-col text-xs">
-                                                        <p className="text-white">{subBet.name}</p>
+                                                    <div className="flex flex-col justify-center text-xs text-sm">
+                                                        <p className="text-white">
+                                                            {subBet.name}
+                                                        </p>
                                                     </div>
                                                 </div>
-                                                <div className="text-white text-xs">
-                                                    <p>${subBet.bet_amount.toFixed(2)}</p>
+                                                <div className="text-xs text-white">
+                                                    <p>
+                                                        $
+                                                        {subBet.bet_amount.toFixed(
+                                                            2
+                                                        )}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -284,7 +373,6 @@ export function BettingContainers({ betAmount }) {
                             </>
                         )}
                     </div>
-
                 </div>
 
                 <div className="flex flex-col items-center justify-center w-full lg:w-1/3 bg-scamdom-40 rounded-xl">
@@ -345,6 +433,100 @@ export function BettingContainers({ betAmount }) {
                         </span>
                         <span>${displayedAmounts.green.toFixed(2)}</span>
                     </div>
+
+                    <div className={`flex flex-col w-full gap-2 mb-7`}>
+                        {/* Top Bet */}
+                        {liveBets.length > 0 && (
+                            <>
+                                {/* Vind de hoogste bet */}
+                                {liveBets
+                                    .filter(
+                                        (bet) => bet.bet_position === "green"
+                                    )
+                                    .sort((a, b) => b.bet_amount - a.bet_amount) // Sorteer de bets van hoog naar laag
+                                    .slice(0, 1) // Neem alleen de hoogste bet (de eerste)
+                                    .map((topBet, index) => (
+                                        <div key={index}>
+                                            <div className="flex items-center justify-between w-full p-2 space-x-2 bg-scamdom-30">
+                                                <div className="flex gap-1.5">
+                                                    <img
+                                                        src={`https://avatar.iran.liara.run/username?username=${topBet.name}`}
+                                                        alt="user profile"
+                                                        className="object-contain size-12"
+                                                    />
+                                                    <div className="flex flex-col justify-center text-sm ">
+                                                        <p className="text-roulette-green">
+                                                            Top{" "}
+                                                            {
+                                                                topBet.bet_position
+                                                            }
+                                                        </p>
+                                                        <p className="text-white">
+                                                            {topBet.name}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div
+                                                    className={`${
+                                                        currentColor === ""
+                                                            ? "text-white" // Default state when currentColor is empty
+                                                            : currentColor ===
+                                                              "green"
+                                                            ? "text-roulette-green" // Profit (green) state
+                                                            : "text-red-600" // Loss (red) state
+                                                    }`}
+                                                >
+                                                    <p>
+                                                        $
+                                                        {topBet.bet_amount.toFixed(
+                                                            2
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                            </>
+                        )}
+
+                        {/* Sub Bets */}
+                        {liveBets.length > 1 && (
+                            <>
+                                {liveBets
+                                    .filter(
+                                        (bet) => bet.bet_position === "green"
+                                    )
+                                    .sort((a, b) => b.bet_amount - a.bet_amount) // Sorteer opnieuw om de volgorde te behouden
+                                    .slice(1) // Neem de overige bets na de hoogste bet
+                                    .map((subBet, index) => (
+                                        <div key={index}>
+                                            <div className="flex items-center justify-between w-full px-2 space-x-2">
+                                                <div className="flex gap-1.5">
+                                                    <img
+                                                        src={`https://avatar.iran.liara.run/username?username=${subBet.name}`}
+                                                        alt="user profile"
+                                                        className="object-contain size-8"
+                                                    />
+                                                    <div className="flex flex-col justify-center text-xs text-sm">
+                                                        <p className="text-white">
+                                                            {subBet.name}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="text-xs text-white">
+                                                    <p>
+                                                        $
+                                                        {subBet.bet_amount.toFixed(
+                                                            2
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                            </>
+                        )}
+                    </div>
                 </div>
 
                 <div className="flex flex-col items-center justify-center w-full lg:w-1/3 bg-scamdom-40 rounded-xl">
@@ -402,6 +584,91 @@ export function BettingContainers({ betAmount }) {
                             <FaUsers className="mr-2" /> {betCounts.black}
                         </span>
                         <span>${displayedAmounts.black.toFixed(2)}</span>
+                    </div>
+
+                    <div className={`flex flex-col w-full gap-2 mb-7`}>
+                        {/* Top Bet */}
+                        {liveBets.length > 0 && (
+                            <>
+                                {/* Vind de hoogste bet */}
+                                {liveBets
+                                    .filter(
+                                        (bet) => bet.bet_position === "black"
+                                    )
+                                    .sort((a, b) => b.bet_amount - a.bet_amount) // Sorteer de bets van hoog naar laag
+                                    .slice(0, 1) // Neem alleen de hoogste bet (de eerste)
+                                    .map((topBet, index) => (
+                                        <div key={index}>
+                                            <div className="flex items-center justify-between w-full p-2 space-x-2 bg-scamdom-30">
+                                                <div className="flex gap-1.5">
+                                                    <img
+                                                        src={`https://avatar.iran.liara.run/username?username=${topBet.name}`}
+                                                        alt="user profile"
+                                                        className="object-contain size-12"
+                                                    />
+                                                    <div className="flex flex-col justify-center text-sm ">
+                                                        <p className="text-roulette-text_black">
+                                                            Top{" "}
+                                                            {
+                                                                topBet.bet_position
+                                                            }
+                                                        </p>
+                                                        <p className="text-white">
+                                                            {topBet.name}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="text-white">
+                                                    <p>
+                                                        $
+                                                        {topBet.bet_amount.toFixed(
+                                                            2
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                            </>
+                        )}
+
+                        {/* Sub Bets */}
+                        {liveBets.length > 1 && (
+                            <>
+                                {liveBets
+                                    .filter(
+                                        (bet) => bet.bet_position === "black"
+                                    )
+                                    .sort((a, b) => b.bet_amount - a.bet_amount) // Sorteer opnieuw om de volgorde te behouden
+                                    .slice(1) // Neem de overige bets na de hoogste bet
+                                    .map((subBet, index) => (
+                                        <div key={index}>
+                                            <div className="flex items-center justify-between w-full px-2 space-x-2">
+                                                <div className="flex gap-1.5">
+                                                    <img
+                                                        src={`https://avatar.iran.liara.run/username?username=${subBet.name}`}
+                                                        alt="user profile"
+                                                        className="object-contain size-8"
+                                                    />
+                                                    <div className="flex flex-col justify-center text-xs text-sm">
+                                                        <p className="text-white">
+                                                            {subBet.name}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="text-xs text-white">
+                                                    <p>
+                                                        $
+                                                        {subBet.bet_amount.toFixed(
+                                                            2
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

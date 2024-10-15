@@ -16,6 +16,14 @@ class RouletteController extends Controller
 {
     public static $gameHash;
 
+    public function getBets(){
+        $hash = Cache::get('rouletteGameHash');
+        $bets = Cache::get('previous_bets_' . $hash, []);
+
+        return response()->json([
+            'bets' => $bets
+        ]);
+    }
 
 
     public static function announceResults($pos) {
@@ -79,6 +87,14 @@ class RouletteController extends Controller
         }
 
         public function placeBet(Request $request) {
+            $game_state = Cache::get('current_game_stage');
+
+            if ($game_state !== 'countdown') {
+                return response()->json([
+                    'message' => 'Game is already in progress'
+                ], 400);
+            }
+
             $bet_amount = $request->input('bet_amount');
             $bet_position = $request->input('bet_position');
             $initial_balance = auth()->user()->balance;
@@ -145,7 +161,14 @@ class RouletteController extends Controller
                 'bet_amount' => $bet_amount,
                 'bet_position' => $bet_position
             ];
+            $existing_positions = Cache::get('previous_bets_' . $hash, []);
 
+            // Append the new position to the array
+
+            $existing_positions[] = $position;
+
+            // Store the updated array back in the cache
+            Cache::put('previous_bets_' . $hash, $existing_positions, 300);
             // Prepare public bet details for live updates
             liveBetsRoulette::dispatch($position);
 
