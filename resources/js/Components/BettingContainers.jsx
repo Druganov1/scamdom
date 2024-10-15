@@ -32,7 +32,7 @@ export function BettingContainers({ betAmount }) {
         green: 0,
     });
 
-    const [locked, setLocked] = useState(false);
+    const [locked, setLocked] = useState(true);
 
     const resetBets = () => {
         setCurrentColor("");
@@ -48,6 +48,10 @@ export function BettingContainers({ betAmount }) {
             .post(route("api.roulette-getbets"))
             .then((response) => {
                 const data = response.data;
+                if (data.stage == "countdown") {
+                    setLocked(false);
+                }
+
                 data.bets.forEach((betObj) => {
                     const betPosition = betObj.bet_position; // e.g., 'red', 'black', or 'green'
                     const username = betObj.user; // Use 'user' to get the username
@@ -115,6 +119,7 @@ export function BettingContainers({ betAmount }) {
                     break;
                 case "spin":
                     setLocked(true);
+
                     break;
                 case "result":
                     setCurrentColor(data.color);

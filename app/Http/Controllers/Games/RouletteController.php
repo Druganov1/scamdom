@@ -19,9 +19,12 @@ class RouletteController extends Controller
     public function getBets(){
         $hash = Cache::get('rouletteGameHash');
         $bets = Cache::get('previous_bets_' . $hash, []);
+        $currentStage = Cache::get('current_game_stage');
+
 
         return response()->json([
-            'bets' => $bets
+            'bets' => $bets,
+            'stage' => $currentStage
         ]);
     }
 
