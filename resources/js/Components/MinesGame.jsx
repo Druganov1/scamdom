@@ -24,19 +24,33 @@ export default function MinesGame() {
 
         const data = new FormData(e.target);
 
-        axios.post(route("api.mineweeper-start"), data).then((response) => {
-            let input = response.data.input;
-            setCashedOut(false);
-            setBustedTile(0); // Reset busted tile
-            setTiles(Array(25).fill(null)); // Reset all tiles
-            setGameStatus("running");
-            setBetAmount(input);
-            setMines(response.data.mines);
-            setGems(response.data.gems);
-            setWinMultiplier(0);
-            setWinAmount(0);
-            setGameHash(response.data.hash);
-        });
+        axios
+            .post(route("api.mineweeper-start"), data)
+            .then((response) => {
+                let input = response.data.input;
+                setCashedOut(false);
+                setBustedTile(0); // Reset busted tile
+                setTiles(Array(25).fill(null)); // Reset all tiles
+                setGameStatus("running");
+                setBetAmount(input);
+                setMines(response.data.mines);
+                setGems(response.data.gems);
+                setWinMultiplier(0);
+                setWinAmount(0);
+                setGameHash(response.data.hash);
+            })
+            .catch(function (error) {
+                toast.error(error.response.data.message, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
+            });
     }
 
     const cashOut = async (e) => {

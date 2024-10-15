@@ -57,6 +57,21 @@ class MinesweeperController extends Controller
 
 
     public function StartGame(Request $request){
+        $initial_balance = auth()->user()->balance;
+        $bet_amount = $request->input('bet_input');
+        // first we need to validate the request
+        $request->validate([
+            'bet_input' => 'required|numeric|min:0.01',
+            'mines_input' => 'required|min:1|max:24',
+        ]);
+
+        if ($bet_amount > $initial_balance) {
+            return response()->json([
+                'message' => 'Insufficient balance'
+            ], 400);
+        }
+
+
         $gamehash = Cache::get('minesweeper_game_' . auth()->id());
         $game = Minesweeper_games::where('hash', $gamehash)->first();
         if ($game) {
@@ -68,24 +83,19 @@ class MinesweeperController extends Controller
         }
 
 
-        $initial_balance = auth()->user()->balance;
-        // first we need to validate the request
-        $request->validate([
-            'bet_input' => 'required|numeric|min:0.01',
-            'mines_input' => 'required|min:1|max:24',
-        ]);
+
 
 
         // then we create the mine_positions array
         $mine_positions = $this->createGrid($request->input('mines_input'));
 
-        $newBalance = auth()->user()->balance - $request->input('bet_input');
+        $newBalance = $initial_balance - $bet_amount;
         BalanceController::updateBalance($newBalance, auth()->user());
 
         $game = Minesweeper_games::create([
             'hash' => md5(uniqid()),
             'user_id' => auth()->id(),
-            'bet_amount' => $request->input('bet_input'),
+            'bet_amount' => $bet_amount,
             'mines' => $request->input('mines_input'),
             'mine_positions' => $mine_positions,
             'revealed_positions' => [],
@@ -98,7 +108,7 @@ class MinesweeperController extends Controller
 
         $this->details = json_encode([
             'hash' => $game->hash,
-            'input' => $request->input('bet_input'),
+            'input' => $bet_amount,
             'mines' => $request->input('mines_input'),
             'gems' => (25 - $request->input('mines_input')),
             'mine_positions' => $mine_positions,
@@ -107,7 +117,7 @@ class MinesweeperController extends Controller
 
         Bets::create([
             'user_id' => auth()->id(),
-            'bet_amount' => $request->input('bet_input'),
+            'bet_amount' => $bet_amount,
             'bet_time' => now(),
             'game_type' => 'mines',
             'details' => $this->details,
@@ -117,7 +127,7 @@ class MinesweeperController extends Controller
         ]);
         return response()->json([
             'hash' => $game->hash,
-            'input' => $request->input('bet_input'),
+            'input' => $bet_amount,
             'mines' => $request->input('mines_input'),
             'gems' => (25 - $request->input('mines_input')),
         ]);

@@ -6,7 +6,7 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import { Head, Link, useForm } from "@inertiajs/react";
 
-export default function Login() {
+export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: "",
         password: "",
@@ -30,7 +30,7 @@ export default function Login() {
                     {status}
                 </div>
             )}
-            <div className="flex items-center justify-center w-1/4  p-10 mx-auto rounded-lg bg-[#1f2937]">
+            <div className="flex items-center justify-center w-3/4 md:w-2/4 lg:w-2/4 xl:w-1/4  p-10 mx-auto rounded-lg bg-[#1f2937]">
                 <form
                     onSubmit={submit}
                     className="flex flex-col w-full space-y-6"
@@ -99,6 +99,14 @@ export default function Login() {
                                 Remember me
                             </span>
                         </label>
+                    </div>
+                    <div className="flex items-center justify-center mt-4">
+                        <Link
+                            href={route("register")}
+                            className="text-sm underline text-scamgreen-40"
+                        >
+                            No account yet?
+                        </Link>
                     </div>
 
                     <div className="flex items-center justify-center mt-4">
