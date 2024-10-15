@@ -177,7 +177,7 @@ const RouletteWheel = () => {
 
     return (
         <div className="flex flex-col items-center">
-            <div className="mb-10 text-white">
+            <div className="mb-10 text-white min-h-16">
                 {showStopwatch && (
                     <RouletteStopwatch initialTimeInMilliseconds={countdown} />
                 )}
