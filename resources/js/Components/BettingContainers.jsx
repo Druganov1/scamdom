@@ -330,7 +330,15 @@ export function BettingContainers({ betAmount }) {
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div className="text-white">
+                                                <div  className={`${
+                                                    currentColor === ""
+                                                        ? "text-white" // Default state when currentColor is empty
+                                                        : currentColor ===
+                                                        "red"
+                                                            ? "text-roulette-green" // Profit (green) state
+                                                            : "text-red-600" // Loss (red) state
+                                                }`}
+                                                >
                                                     <p>
                                                         $
                                                         {topBet.bet_amount.toFixed(
@@ -361,13 +369,22 @@ export function BettingContainers({ betAmount }) {
                                                         round={true}
                                                         textSizeRatio={1.75}
                                                     />
-                                                    <div className="flex flex-col justify-center text-xs text-sm">
+                                                    <div className="flex flex-col justify-center text-xs">
                                                         <p className="text-white">
                                                             {subBet.name}
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div className="text-xs text-white">
+                                                <div
+                                                    className={`text-xs ${
+                                                    currentColor === ""
+                                                        ? "text-white" // Default state when currentColor is empty
+                                                        : currentColor ===
+                                                        "red"
+                                                            ? "text-roulette-green" // Profit (green) state
+                                                            : "text-red-600" // Loss (red) state
+                                                    }`}
+                                                >
                                                     <p>
                                                         $
                                                         {subBet.bet_amount.toFixed(
@@ -517,13 +534,20 @@ export function BettingContainers({ betAmount }) {
                                                         round={true}
                                                         textSizeRatio={1.75}
                                                     />
-                                                    <div className="flex flex-col justify-center text-xs text-sm">
+                                                    <div className="flex flex-col justify-center text-xs">
                                                         <p className="text-white">
                                                             {subBet.name}
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div className="text-xs text-white">
+                                                <div className={`text-xs ${
+                                                    currentColor === ""
+                                                        ? "text-white" // Default state when currentColor is empty
+                                                        : currentColor ===
+                                                        "green"
+                                                            ? "text-roulette-green" // Profit (green) state
+                                                            : "text-red-600" // Loss (red) state
+                                                }`}>
                                                     <p>
                                                         $
                                                         {subBet.bet_amount.toFixed(
@@ -629,7 +653,14 @@ export function BettingContainers({ betAmount }) {
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div className="text-white">
+                                                <div className={`${
+                                                    currentColor === ""
+                                                        ? "text-white" // Default state when currentColor is empty
+                                                        : currentColor ===
+                                                        "black"
+                                                            ? "text-roulette-green" // Profit (green) state
+                                                            : "text-red-600" // Loss (red) state
+                                                }`}>
                                                     <p>
                                                         $
                                                         {topBet.bet_amount.toFixed(
@@ -668,7 +699,14 @@ export function BettingContainers({ betAmount }) {
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div className="text-xs text-white">
+                                                <div className={`text-xs ${
+                                                    currentColor === ""
+                                                        ? "text-white" // Default state when currentColor is empty
+                                                        : currentColor ===
+                                                        "black"
+                                                            ? "text-roulette-green" // Profit (green) state
+                                                            : "text-red-600" // Loss (red) state
+                                                }`}>
                                                     <p>
                                                         $
                                                         {subBet.bet_amount.toFixed(
