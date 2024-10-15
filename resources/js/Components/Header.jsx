@@ -2,7 +2,7 @@ import Dropdown from "@/Components/Dropdown";
 import WalletComp from "@/Components/WalletComp";
 import { Link } from "@inertiajs/react";
 import { useState } from "react";
-
+import Avatar from "react-avatar";
 export default function Header({ user }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -73,10 +73,11 @@ export default function Header({ user }) {
                         <Dropdown>
                             <Dropdown.Trigger>
                                 <span className="w-10 h-10 overflow-hidden rounded-full">
-                                    <img
-                                        src={`https://avatar.iran.liara.run/username?username=${user.name}`}
-                                        alt="user profile"
-                                        className="object-contain size-12"
+                                    <Avatar
+                                        name={user.name}
+                                        size="50"
+                                        round={true}
+                                        textSizeRatio={1.75}
                                     />
                                 </span>
                             </Dropdown.Trigger>

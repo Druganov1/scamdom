@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { FaUsers } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { BalanceContext } from "@/Layouts/AuthenticatedLayout.jsx";
+import Avatar from "react-avatar";
 
 export function BettingContainers({ betAmount }) {
     const balance = useContext(BalanceContext);
@@ -311,10 +312,11 @@ export function BettingContainers({ betAmount }) {
                                         <div key={index}>
                                             <div className="flex items-center justify-between w-full p-2 space-x-2 bg-scamdom-30">
                                                 <div className="flex gap-1.5">
-                                                    <img
-                                                        src={`https://avatar.iran.liara.run/username?username=${topBet.name}`}
-                                                        alt="user profile"
-                                                        className="object-contain size-12"
+                                                    <Avatar
+                                                        name={topBet.name}
+                                                        size="40"
+                                                        round={true}
+                                                        textSizeRatio={1.75}
                                                     />
                                                     <div className="flex flex-col justify-center text-sm ">
                                                         <p className="text-roulette-red">
@@ -353,10 +355,11 @@ export function BettingContainers({ betAmount }) {
                                         <div key={index}>
                                             <div className="flex items-center justify-between w-full px-2 space-x-2">
                                                 <div className="flex gap-1.5">
-                                                    <img
-                                                        src={`https://avatar.iran.liara.run/username?username=${subBet.name}`}
-                                                        alt="user profile"
-                                                        className="object-contain size-8"
+                                                    <Avatar
+                                                        name={subBet.name}
+                                                        size="29"
+                                                        round={true}
+                                                        textSizeRatio={1.75}
                                                     />
                                                     <div className="flex flex-col justify-center text-xs text-sm">
                                                         <p className="text-white">
@@ -454,10 +457,11 @@ export function BettingContainers({ betAmount }) {
                                         <div key={index}>
                                             <div className="flex items-center justify-between w-full p-2 space-x-2 bg-scamdom-30">
                                                 <div className="flex gap-1.5">
-                                                    <img
-                                                        src={`https://avatar.iran.liara.run/username?username=${topBet.name}`}
-                                                        alt="user profile"
-                                                        className="object-contain size-12"
+                                                    <Avatar
+                                                        name={topBet.name}
+                                                        size="40"
+                                                        round={true}
+                                                        textSizeRatio={1.75}
                                                     />
                                                     <div className="flex flex-col justify-center text-sm ">
                                                         <p className="text-roulette-green">
@@ -507,10 +511,11 @@ export function BettingContainers({ betAmount }) {
                                         <div key={index}>
                                             <div className="flex items-center justify-between w-full px-2 space-x-2">
                                                 <div className="flex gap-1.5">
-                                                    <img
-                                                        src={`https://avatar.iran.liara.run/username?username=${subBet.name}`}
-                                                        alt="user profile"
-                                                        className="object-contain size-8"
+                                                    <Avatar
+                                                        name={subBet.name}
+                                                        size="29"
+                                                        round={true}
+                                                        textSizeRatio={1.75}
                                                     />
                                                     <div className="flex flex-col justify-center text-xs text-sm">
                                                         <p className="text-white">
@@ -606,10 +611,11 @@ export function BettingContainers({ betAmount }) {
                                         <div key={index}>
                                             <div className="flex items-center justify-between w-full p-2 space-x-2 bg-scamdom-30">
                                                 <div className="flex gap-1.5">
-                                                    <img
-                                                        src={`https://avatar.iran.liara.run/username?username=${topBet.name}`}
-                                                        alt="user profile"
-                                                        className="object-contain size-12"
+                                                    <Avatar
+                                                        name={topBet.name}
+                                                        size="40"
+                                                        round={true}
+                                                        textSizeRatio={1.75}
                                                     />
                                                     <div className="flex flex-col justify-center text-sm ">
                                                         <p className="text-roulette-text_black">
@@ -650,10 +656,11 @@ export function BettingContainers({ betAmount }) {
                                         <div key={index}>
                                             <div className="flex items-center justify-between w-full px-2 space-x-2">
                                                 <div className="flex gap-1.5">
-                                                    <img
-                                                        src={`https://avatar.iran.liara.run/username?username=${subBet.name}`}
-                                                        alt="user profile"
-                                                        className="object-contain size-8"
+                                                    <Avatar
+                                                        name={subBet.name}
+                                                        size="29"
+                                                        round={true}
+                                                        textSizeRatio={1.75}
                                                     />
                                                     <div className="flex flex-col justify-center text-xs text-sm">
                                                         <p className="text-white">
