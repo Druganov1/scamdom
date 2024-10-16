@@ -310,7 +310,16 @@ export function BettingContainers({ betAmount }) {
                                     .slice(0, 1) // Neem alleen de hoogste bet (de eerste)
                                     .map((topBet, index) => (
                                         <div key={index}>
-                                            <div className="flex items-center justify-between w-full p-2 space-x-2 bg-scamdom-30">
+                                            <div
+                                                 className={`flex items-center justify-between w-full p-2 space-x-2 bg-scamdom-30 ${
+                                                     currentColor === ""
+                                                         ? "" // Default state when currentColor is empty
+                                                         : currentColor ===
+                                                         "red"
+                                                             ? "" // Profit (green) state
+                                                             : "opacity-50" // Loss (red) state
+                                                 }`}
+                                            >
                                                 <div className="flex gap-1.5">
                                                     <Avatar
                                                         name={topBet.name}
@@ -361,7 +370,14 @@ export function BettingContainers({ betAmount }) {
                                     .slice(1) // Neem de overige bets na de hoogste bet
                                     .map((subBet, index) => (
                                         <div key={index}>
-                                            <div className="flex items-center justify-between w-full px-2 space-x-2">
+                                            <div className={`flex items-center justify-between w-full px-2 space-x-2 ${
+                                                     currentColor === ""
+                                                         ? "" // Default state when currentColor is empty
+                                                         : currentColor ===
+                                                         "red"
+                                                             ? "" // Profit (green) state
+                                                             : "opacity-50" // Loss (red) state
+                                                 }`}>
                                                 <div className="flex gap-1.5">
                                                     <Avatar
                                                         name={subBet.name}
@@ -472,7 +488,14 @@ export function BettingContainers({ betAmount }) {
                                     .slice(0, 1) // Neem alleen de hoogste bet (de eerste)
                                     .map((topBet, index) => (
                                         <div key={index}>
-                                            <div className="flex items-center justify-between w-full p-2 space-x-2 bg-scamdom-30">
+                                            <div className={`flex items-center justify-between w-full p-2 space-x-2 bg-scamdom-30 ${
+                                                currentColor === ""
+                                                    ? "" // Default state when currentColor is empty
+                                                    : currentColor ===
+                                                    "green"
+                                                        ? "" // Profit (green) state
+                                                        : "opacity-50" // Loss (red) state
+                                            }`}>
                                                 <div className="flex gap-1.5">
                                                     <Avatar
                                                         name={topBet.name}
@@ -526,7 +549,14 @@ export function BettingContainers({ betAmount }) {
                                     .slice(1) // Neem de overige bets na de hoogste bet
                                     .map((subBet, index) => (
                                         <div key={index}>
-                                            <div className="flex items-center justify-between w-full px-2 space-x-2">
+                                            <div className={`flex items-center justify-between w-full px-2 space-x-2 ${
+                                                currentColor === ""
+                                                    ? "" // Default state when currentColor is empty
+                                                    : currentColor ===
+                                                    "green"
+                                                        ? "" // Profit (green) state
+                                                        : "opacity-50" // Loss (red) state
+                                            }`}>
                                                 <div className="flex gap-1.5">
                                                     <Avatar
                                                         name={subBet.name}
@@ -633,7 +663,14 @@ export function BettingContainers({ betAmount }) {
                                     .slice(0, 1) // Neem alleen de hoogste bet (de eerste)
                                     .map((topBet, index) => (
                                         <div key={index}>
-                                            <div className="flex items-center justify-between w-full p-2 space-x-2 bg-scamdom-30">
+                                            <div className={`flex items-center justify-between w-full p-2 space-x-2 bg-scamdom-30 ${
+                                                currentColor === ""
+                                                    ? "" // Default state when currentColor is empty
+                                                    : currentColor ===
+                                                    "black"
+                                                        ? "" // Profit (green) state
+                                                        : "opacity-50" // Loss (red) state
+                                            }`}>
                                                 <div className="flex gap-1.5">
                                                     <Avatar
                                                         name={topBet.name}
@@ -685,7 +722,14 @@ export function BettingContainers({ betAmount }) {
                                     .slice(1) // Neem de overige bets na de hoogste bet
                                     .map((subBet, index) => (
                                         <div key={index}>
-                                            <div className="flex items-center justify-between w-full px-2 space-x-2">
+                                            <div className={`flex items-center justify-between w-full px-2 space-x-2 ${
+                                                currentColor === ""
+                                                    ? "" // Default state when currentColor is empty
+                                                    : currentColor ===
+                                                    "black"
+                                                        ? "" // Profit (green) state
+                                                        : "opacity-50" // Loss (red) state
+                                            }`}>
                                                 <div className="flex gap-1.5">
                                                     <Avatar
                                                         name={subBet.name}
