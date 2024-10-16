@@ -14,6 +14,7 @@ const RouletteWheel = () => {
     const [slot, setSlot] = useState(0);
     const [countdown, setCountdown] = useState(0);
     const [lastRolls, setLastRolls] = useState([]);
+    const [lastColor, setLastColor] = useState("red");
 
     const wheelRef = useRef(null);
     useEffect(() => {
@@ -29,6 +30,7 @@ const RouletteWheel = () => {
             .then((response) => {
                 const data = response.data;
                 setLastRolls(data.last_rolls);
+                setLastColor(data.color);
 
                 if (data.currentStage === "countdown") {
                     setCountdown(data.remainingTime);
@@ -79,7 +81,7 @@ const RouletteWheel = () => {
                     break;
                 case "result":
                     resultAudio.play();
-
+                    setLastColor(data.color);
                     setLanded(true);
                     setSpinning(false);
 
@@ -177,9 +179,12 @@ const RouletteWheel = () => {
 
     return (
         <div className="flex flex-col items-center">
-            <div className="mb-10 text-white min-h-16">
+            <div className="w-1/3 mb-10 text-white min-h-16">
                 {showStopwatch && (
-                    <RouletteStopwatch initialTimeInMilliseconds={countdown} />
+                    <RouletteStopwatch
+                        lastColor={lastColor}
+                        initialTimeInMilliseconds={countdown}
+                    />
                 )}
                 {spinningNow && <SpinningNow />}
                 {landed && <RouletteResult result={slot} />}

@@ -1,36 +1,60 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 
-export default function RouletteStopwatch({ initialTimeInMilliseconds }) {
-  const [seconds, setSeconds] = useState(initialTimeInMilliseconds / 1000);
-  const startTimeRef = useRef(null);
+export default function RouletteStopwatch({
+    initialTimeInMilliseconds,
+    lastColor,
+}) {
+    const totalTime = 15000; // 15,000 milliseconds or 15 seconds
+    const [seconds, setSeconds] = useState(initialTimeInMilliseconds / 1000);
+    const [progress, setProgress] = useState(0); // Will adjust based on remaining time
 
-  useEffect(() => {
-    startTimeRef.current = performance.now();
+    const startTimeRef = useRef(performance.now());
 
-    const intervalId = setInterval(() => {
-      const elapsedTime = performance.now() - startTimeRef.current;
-      const totalElapsedTimeInSeconds = elapsedTime / 1000;
+    useEffect(() => {
+        // This function updates the remaining time and progress width
+        const updateProgress = () => {
+            const elapsedTime = performance.now() - startTimeRef.current; // Time elapsed since component mount
+            const remainingTime = Math.max(
+                0,
+                initialTimeInMilliseconds - elapsedTime
+            ); // Remaining time in milliseconds
 
-      // Calculate remaining time
-      const remainingTimeInSeconds = Math.max(0, (initialTimeInMilliseconds / 1000) - totalElapsedTimeInSeconds);
+            setSeconds(remainingTime / 1000); // Convert to seconds for display
 
-      setSeconds(remainingTimeInSeconds);
+            // Calculate the correct width for the progress bar
+            const progressPercentage = (remainingTime / totalTime) * 100;
+            setProgress(progressPercentage);
 
-      if (remainingTimeInSeconds <= 0) {
-        clearInterval(intervalId);
-      }
-    }, 10); // Update every 10ms for higher resolution
+            // Clear the interval if time runs out
+            if (remainingTime <= 0) {
+                clearInterval(intervalId);
+            }
+        };
 
-    // Cleanup on component unmount
-    return () => clearInterval(intervalId);
-  }, [initialTimeInMilliseconds]);
+        const intervalId = setInterval(updateProgress, 10); // Update every 10ms for smooth progress
 
-  return (
-    <div className='flex flex-col items-center justify-center'>
-      <p className='text-xs mb-1'>Spinning in</p>
-      <h5 className='text-2xl font-mono'>
-        {String(Math.floor(seconds)).padStart(2, '0')}.{String(Math.floor((seconds % 1) * 100)).padStart(2, '0')} s
-      </h5>
-    </div>
-  );
+        return () => clearInterval(intervalId); // Cleanup on unmount
+    }, [initialTimeInMilliseconds]);
+
+    return (
+        <div className="flex flex-col items-center justify-center w-full">
+            <p className="mb-1 text-xs">Spinning in</p>
+            <h5 className="font-mono text-2xl">
+                {String(Math.floor(seconds)).padStart(2, "0")}.
+                {String(Math.floor((seconds % 1) * 100)).padStart(2, "0")} s
+            </h5>
+            <div className="w-full h-2 rounded-full bg-scamdom-30">
+                <div
+                    className={`h-full rounded-full ${
+                        lastColor === "red"
+                            ? "bg-roulette-red"
+                            : lastColor === "green"
+                            ? "bg-roulette-green"
+                            : "bg-roulette-black"
+                    }`}
+                    style={{ width: `${progress}%` }}
+                ></div>
+            </div>
+        </div>
+    );
 }

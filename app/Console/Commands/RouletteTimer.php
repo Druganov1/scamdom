@@ -78,12 +78,20 @@ class RouletteTimer extends Command
             $timeAtSpin = null;
         }
 
+        $color = match ($cachedGameResult) {
+            0 => 'green',
+            1, 2, 3, 4, 5, 6, 7 => 'red',
+            8, 9, 10, 11, 12, 13, 14 => 'black',
+            default => null, // fallback for invalid result
+        };
+
         return [
             'timeAtSpin' => $timeAtSpin,
             'gameResult' => $cachedGameResult,
             'remainingTime' => $remainingTime,
             'currentStage' => $currentStage,
             'last_rolls' => $last_rolls,
+            'color' => $color
         ];
     }
 

@@ -31,7 +31,7 @@ export default function Bets({ auth, bets }) {
         <AuthenticatedLayout user={auth.user}>
             <Head title="Bets" />
 
-            <div className="container px-3 py-12 md:px-0">
+            <div className="container px-3 py-12 mx-auto md:px-0">
                 <div className="mx-auto space-y-6 max-w-7xl sm:px-6 lg:px-8">
                     <div className="flex flex-col gap-3 p-4 bg-gray-800 shadow sm:p-8 rounded-2xl">
                         <h1 className="text-3xl text-white">My bets</h1>
