@@ -1,66 +1,120 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Scamdom
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Scamdom** is a parody casino platform created as part of a school project. Developed in a team of two, this project demonstrates the mechanics of online gambling platforms in a humorous and educational way. It does not involve any real gambling or monetary transactions.
 
-## About Laravel
+## Table of Contents
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- [About](#about)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Disclaimer](#disclaimer)
+- [License](#license)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## About
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Scamdom was created to explore how online gambling platforms operate while critiquing their often manipulative practices. This project simulates a functional casino environment, focusing on two games: **Roulette** and **Mines**, each with predetermined outcomes to highlight how such systems can be manipulated.
 
-## Learning Laravel
+## Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Two fully functional games:
+  - **Roulette**: A synchronized game where the outcome is predetermined and shared across all players in real-time.
+  - **Mines**: A unique game for each player with outcomes predetermined upon starting the game.
+- A fully functional realtime live chat system synced across every player.
+- Built to showcase:
+  - How outcomes can be manipulated behind the scenes.
+  - The illusion of fairness in gambling systems.
+- User-friendly design, emphasizing fun and educational value.
+---
+## Installation
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Druganov1/scamdom.git
+   ```
+2. Navigate to the project directory:
+  ```bash
+  cd scamdom
+  ```
+3. Install PHP dependencies using Composer:
+  ```bash
+composer install
+  ```
+4. Install JavaScript dependencies using npm:
+  ```bash
+npm install
+  ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+5. Copy the `.env.example` file to `.env`:
+  ```bash
+cp .env.example .env
+  ```
 
-## Laravel Sponsors
+6. Generate an application key:
+```bash
+php artisan key:generate
+```
+7. Configure your .env file with database credentials and other environment variables.
+#### This app uses the pusher protocol to maintain a live websocket connection between the client and server, you can create an account with a generous free tier at [Pusher](https://pusher.com/) (or you can host your own websocket server with [Soketi](https://soketi.app/), free and open source 😄)
+8. Run database migrations:
+```bash
+php artisan migrate
+```
+9. Build frontend assets:
+```bash
+npm run dev 
+```
+10. Start the development server:
+```bash
+php artisan serve
+```
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Usage
 
-### Premium Partners
+1. **Access the Application**
+   - Start the Laravel development server:
+     ```bash
+     php artisan serve
+     ```
+   - Open the application in your browser at `http://localhost:8000` (or the address provided in the terminal).
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+2. **Register or Login**
+   - Create an account or log in using the provided form. This is for demonstration purposes and does not involve real user accounts or sensitive data.
 
-## Contributing
+3. **Play Games**
+   - Navigate to the games section in the app.
+   - **Roulette**:
+     - Join a live game with other players.
+     - Observe the synchronized outcomes shared across all participants.
+   - **Mines**:
+     - Start a new game where outcomes are unique and predetermined for each player.
+     - Strategically reveal tiles while avoiding mines to earn points.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+4. **Real-Time Updates**
+   - The app uses WebSocket connections powered by Pusher to provide live updates in **Roulette**, ensuring a synchronized experience for all players.
+   - Chat with other players, moderators have a special badge in the chat.
 
-## Code of Conduct
+5. **Educational Features**
+   - Review the mechanics behind the scenes to understand how outcomes are predetermined.
+   - Observe how these mechanics simulate fairness but can be controlled by the platform.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+6. **End the Session**
+   - Once finished, log out of your account, or simply close the browser.
+---
+## Disclaimer
 
-## Security Vulnerabilities
+**Scamdom** is a parody project created for educational purposes only. It is not a real gambling platform, and no actual money or real-world assets are involved in any of the games. All outcomes in the games are predetermined and are intended to showcase how online gambling platforms can manipulate perceptions of fairness.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- **No Real Gambling**: The platform does not involve real-money betting or transactions. The in-game currency and outcomes are simulated and hold no real-world value.
+- **Educational Intent**: The purpose of this project is to demonstrate the mechanics of online gambling platforms, critique common practices in the industry, and highlight how easily outcomes can be manipulated behind the scenes.
+- **Privacy**: No personal data is collected or used in this project. If user authentication is implemented, it is for the sole purpose of demonstration and does not involve any real-world user data.
+- **Legal Compliance**: This project is not intended for use in any jurisdiction where online gambling is regulated or illegal. It is purely for educational purposes and should not be used to promote or engage in real-world gambling activities.
+- **No Liability**: The developers are not responsible for any misuse of this project or any harm caused by the use of this platform, including but not limited to gambling behavior, addiction, or loss of money. The project is not intended to encourage or endorse real gambling.
 
+By using this app, you acknowledge that it is a parody and agree to use it for educational purposes only.
+
+---
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is licensed under the **MIT License** - see the [LICENSE.md](LICENSE.md) file for details.
